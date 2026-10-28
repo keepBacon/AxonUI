@@ -1,0 +1,15 @@
+name: axon_flclash_flutter
+description: Axon controls rebuilt as a standalone Flutter Material 3 UI kit inspired by FlClash.
+publish_to: none
+version: 3.0.0+3
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+flutter:
+  uses-material-design: true

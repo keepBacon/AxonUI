@@ -1,0 +1,144 @@
+name: Axon FlClash UI-only APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'scripts/**'
+      - 'pubspec.yaml'
+      - 'analysis_options.yaml'
+      - 'axon_flclash_flutter/**'
+      - 'Axon_FlClash_*.zip'
+      - '.github/workflows/build-apk.yml'
+  pull_request:
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'scripts/**'
+      - 'pubspec.yaml'
+      - 'analysis_options.yaml'
+      - 'axon_flclash_flutter/**'
+      - 'Axon_FlClash_*.zip'
+      - '.github/workflows/build-apk.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: axon-ui-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Locate or extract Flutter app
+        id: locate
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f pubspec.yaml && -f lib/main.dart ]]; then
+            APP_DIR='.'
+          elif [[ -f axon_flclash_flutter/pubspec.yaml ]]; then
+            APP_DIR='axon_flclash_flutter'
+          else
+            shopt -s nullglob
+            archives=(Axon_FlClash_*v3.zip)
+            if [[ ${#archives[@]} -eq 0 ]]; then
+              echo 'Upload Axon_FlClash_Flutter_UI_Only_v3.zip or extract the project directory.' >&2
+              exit 1
+            fi
+            if [[ ${#archives[@]} -gt 1 ]]; then
+              echo 'Keep only one v3 ZIP in the repository root.' >&2
+              exit 1
+            fi
+            mkdir -p .ci-unpacked
+            unzip -q "${archives[0]}" -d .ci-unpacked
+            path="$(find .ci-unpacked -maxdepth 5 -type f -name pubspec.yaml -print -quit)"
+            if [[ -z "$path" ]]; then
+              echo 'No Flutter pubspec.yaml was found inside ZIP.' >&2
+              exit 1
+            fi
+            APP_DIR="$(dirname "$path")"
+          fi
+          [[ -f "$APP_DIR/lib/main.dart" ]] || { echo 'lib/main.dart missing' >&2; exit 1; }
+          echo "APP_DIR=$APP_DIR" >> "$GITHUB_ENV"
+          echo "Using Flutter application: $APP_DIR"
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter (pinned stable)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.7'
+          channel: stable
+          cache: true
+          pub-cache: true
+
+      - name: Generate Android host / apply native settings bridge
+        shell: bash
+        working-directory: ${{ env.APP_DIR }}
+        run: |
+          set -euo pipefail
+          flutter config --no-analytics
+          flutter create --platforms=android --org com.axon --project-name axon_flclash_flutter --no-pub .
+          bash scripts/prepare_android.sh
+          flutter pub get
+
+      - name: Static analysis
+        shell: bash
+        working-directory: ${{ env.APP_DIR }}
+        run: |
+          set -o pipefail
+          flutter analyze --no-fatal-infos 2>&1 | tee "${RUNNER_TEMP}/axon-analyze.log"
+
+      - name: Widget and MethodChannel tests
+        shell: bash
+        working-directory: ${{ env.APP_DIR }}
+        run: |
+          set -o pipefail
+          flutter test --reporter expanded 2>&1 | tee "${RUNNER_TEMP}/axon-tests.log"
+
+      - name: Build arm64 release APK
+        shell: bash
+        working-directory: ${{ env.APP_DIR }}
+        run: |
+          set -euo pipefail
+          flutter build apk --release --target-platform android-arm64 2>&1 | tee "${RUNNER_TEMP}/axon-build.log"
+          test -s build/app/outputs/flutter-apk/app-release.apk
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-release.apk dist/Axon-FlClash-UI-only-arm64-v3.apk
+          (cd dist && sha256sum Axon-FlClash-UI-only-arm64-v3.apk > SHA256SUMS.txt)
+          ls -lh dist/
+
+      - name: Upload APK to GitHub Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Axon-FlClash-UI-only-ARM64-${{ github.run_number }}
+          path: ${{ env.APP_DIR }}/dist/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
+      - name: Upload CI logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Axon-FlClash-build-logs-${{ github.run_number }}
+          path: |
+            ${{ runner.temp }}/axon-analyze.log
+            ${{ runner.temp }}/axon-tests.log
+            ${{ runner.temp }}/axon-build.log
+          if-no-files-found: warn
+          retention-days: 7

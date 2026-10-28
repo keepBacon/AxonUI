@@ -1,0 +1,8 @@
+<!-- Snippet only: merge the following element into Axon's existing <application>. -->
+<activity
+    android:name=".AxonFlutterGalleryActivity"
+    android:exported="false"
+    android:theme="@android:style/Theme.Material.Light.NoActionBar"
+    android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+    android:hardwareAccelerated="true"
+    android:windowSoftInputMode="adjustResize" />
