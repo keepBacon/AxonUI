@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'advanced_controls.dart';
-import 'axon_controls.dart';
 import 'axon_schema.dart';
 import 'bridge.dart';
 import 'common.dart';
@@ -70,7 +69,7 @@ class _AxonCoverageGalleryState extends State<AxonCoverageGallery> {
   double _minPressure = 10, _maxPressure = 80;
   List<String> _palette = ['#FF2276D8', '#FF17B99B', '#FF9B77DE'];
   String _gamepadKey = '无';
-  List<String> _layers = ['键盘显示', '鼠标轨迹', '手柄状态', '触控热点'];
+  final List<String> _layers = ['键盘显示', '鼠标轨迹', '手柄状态', '触控热点'];
   List<double> _stats = [12, 16, 13, 18, 16, 22, 15, 19, 18, 20, 18, 14, 16];
   String _profile = '均衡';
   bool _active = true;
@@ -163,7 +162,7 @@ class _AxonCoverageGalleryState extends State<AxonCoverageGallery> {
     AxonCard(child: AxonSwitchTile(title: '显示浮窗（模拟）', value: _active,
       icon: Icons.visibility_rounded, onChanged: (v) => setState(() => _active = v))),
     const SizedBox(height: 10),
-    Wrap(spacing: 8, runSpacing: 8, children: const [
+    const Wrap(spacing: 8, runSpacing: 8, children: [
       AxonStatusBadge('键盘模型', isActive: true), AxonStatusBadge('手柄响应', isActive: true),
       AxonStatusBadge('Live2D 接口未接入'),
     ]),

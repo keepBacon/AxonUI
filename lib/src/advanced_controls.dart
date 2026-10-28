@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'axon_schema.dart';
 import 'common.dart';
 import 'controls.dart';
-import 'theme.dart';
 
 /// Precision slider + editable numeric value. Values are quantized to Axon's step.
 class AxonPrecisionSlider extends StatefulWidget {

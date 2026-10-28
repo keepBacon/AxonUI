@@ -168,7 +168,7 @@ class AxonTextInput extends StatelessWidget {
 }
 
 class AxonSearchInput extends StatelessWidget {
-  const AxonSearchInput({super.key, required this.controller, this.onChanged, this.hint = '搜索控件'});
+  const AxonSearchInput({super.key, required this.controller, required this.onChanged, this.hint = '搜索控件'});
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
   final String hint;
@@ -255,7 +255,9 @@ class _AxonReorderListState extends State<AxonReorderList> {
     buildDefaultDragHandles: false,
     shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
     itemCount: widget.items.length,
-    onReorder: widget.onReorder,
+    // Keep AxonReorderList's legacy (unadjusted) index contract for callers.
+    onReorderItem: (oldIndex, newIndex) => widget.onReorder(
+      oldIndex, newIndex > oldIndex ? newIndex + 1 : newIndex),
     itemBuilder: (context, i) => ListTile(
       key: ValueKey(widget.items[i]),
       dense: true,

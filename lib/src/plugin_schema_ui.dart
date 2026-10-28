@@ -58,18 +58,23 @@ class AxonPluginFieldEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Public nullable fields are not type-promoted by Dart; use local variables.
+    final currentValue = value;
+    final defaultValue = field.defaultValue;
     switch (field.type) {
       case 'toggle':
         return AxonSwitchTile(title: field.name, value: value == true,
           onChanged: (v) => onChanged(v));
       case 'slider':
         return AxonPrecisionSlider(label: field.name,
-          value: value is num ? value.toDouble() : (field.defaultValue as num).toDouble(),
+          value: currentValue is num ? currentValue.toDouble() :
+            defaultValue is num ? defaultValue.toDouble() : field.min,
           min: field.min, max: field.max, step: field.step, unit: field.suffix,
           onChanged: onChanged);
       case 'number':
         return AxonPrecisionSlider(label: field.name,
-          value: value is num ? value.toDouble() : (field.defaultValue as num).toDouble(),
+          value: currentValue is num ? currentValue.toDouble() :
+            defaultValue is num ? defaultValue.toDouble() : field.min,
           min: field.min, max: field.max, step: field.step, unit: field.suffix,
           onChanged: onChanged);
       case 'select':
@@ -87,11 +92,11 @@ class AxonPluginFieldEditor extends StatelessWidget {
       case 'key':
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(field.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-          AxonKeyCodeInput(value: value is num ? value.toInt() : -1,
+          AxonKeyCodeInput(value: currentValue is num ? currentValue.toInt() : -1,
             onChanged: (v) => onChanged(v)),
         ]);
       case 'binding':
-        final raw = value is Map ? Map<String, dynamic>.from(value as Map) :
+        final raw = currentValue is Map ? Map<String, dynamic>.from(currentValue) :
           normalizeAxonBinding(field.defaultValue);
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(field.name, style: const TextStyle(fontWeight: FontWeight.w600)),
@@ -99,12 +104,12 @@ class AxonPluginFieldEditor extends StatelessWidget {
           AxonBindingEditor(value: raw, onChanged: onChanged),
         ]);
       case 'color':
-        final colors = value is List ? value.map((e) => e.toString()).toList() :
+        final colors = currentValue is List ? currentValue.map((e) => e.toString()).toList() :
           (field.newDefault() as List).cast<String>();
         return AxonArgbEditor(label: field.name, colors: colors, onChanged: (v) => onChanged(v));
       case 'list':
-        final rows = value is List
-            ? value.whereType<Map>().map((r) => Map<String, dynamic>.from(r)).toList()
+        final rows = currentValue is List
+            ? currentValue.whereType<Map>().map((r) => Map<String, dynamic>.from(r)).toList()
             : <Map<String, dynamic>>[];
         return AxonPluginListEditor(field: field, rows: rows, onChanged: (v) => onChanged(v));
       default:
@@ -160,10 +165,9 @@ class _AxonPluginListEditorState extends State<AxonPluginListEditor> {
         buildDefaultDragHandles: false, shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: rows.length,
-        onReorder: (from, to) {
+        onReorderItem: (from, to) {
           final next = [...rows];
           final ids = _rowIds;
-          if (to > from) to--;
           final item = next.removeAt(from); next.insert(to, item);
           final id = ids.removeAt(from); ids.insert(to, id);
           widget.onChanged(next);

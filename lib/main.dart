@@ -98,7 +98,7 @@ class _AxonGalleryHomeState extends State<AxonGalleryHome> {
   String _connectionMode = '稳定';
   Map<String, dynamic> _dynamicValues = {'overlay_toggle': true, 'overlay_fps': 60.0, 'control_mode': '均衡'};
   Set<String> _selectedChips = {'触控', '手柄'};
-  List<String> _layers = ['顶部状态信息', '虚拟键盘', '触控区域', '手柄响应提示'];
+  final List<String> _layers = ['顶部状态信息', '虚拟键盘', '触控区域', '手柄响应提示'];
   List<Offset> _curve = const [Offset(0, 0), Offset(.5, .55), Offset(1, 1)];
   final _search = TextEditingController();
   final _input = TextEditingController(text: 'Axon UI Profile');
@@ -254,9 +254,9 @@ class _AxonGalleryHomeState extends State<AxonGalleryHome> {
           icon: Icons.rocket_launch_outlined, value: _quickToggle,
           onChanged: (v) => setState(() => _quickToggle = v)),
         const Divider(height: 1),
-        AxonSettingTile(title: '手柄检测', subtitle: '独立状态交互',
-          leading: const Icon(Icons.sports_esports_outlined),
-          trailing: const AxonTag('正常', icon: Icons.check_circle_outline, selected: true)),
+        const AxonSettingTile(title: '手柄检测', subtitle: '独立状态交互',
+          leading: Icon(Icons.sports_esports_outlined),
+          trailing: AxonTag('正常', icon: Icons.check_circle_outline, selected: true)),
         _space(),
         AxonSegmentedControl(labels: const ['舒适', '均衡', '真实'], selected: _segment,
           onChanged: (v) => setState(() => _segment = v)),
