@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'axon_flclash_ui.dart';
 import 'src/coverage_gallery.dart';
-import 'src/flclash_theme_gallery.dart';
 
 void main() => runApp(const AxonDemoApp());
 

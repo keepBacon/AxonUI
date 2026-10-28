@@ -413,7 +413,7 @@ class _FlClashThemeGalleryState extends State<FlClashThemeGallery> {
                       style: const TextStyle(fontSize: 16,color: FlClashPalette.muted)),
                     const SizedBox(width: 8),const Icon(Icons.unfold_more_rounded,size: 20),
                   ])))),
-              FlSectionHeader(icon: Icons.palette_outlined,title:'主题色'),
+              const FlSectionHeader(icon: Icons.palette_outlined,title:'主题色'),
               SizedBox(height:54, child: ListView(scrollDirection: Axis.horizontal,
                 children:[for(final color in _colors) GestureDetector(
                   onTap: () => widget.onSeedChanged(color),
@@ -484,7 +484,7 @@ class _FlClashThemeGalleryState extends State<FlClashThemeGallery> {
                   FlDiscreteScale(value:_scale,onChanged:(v){setState(() {
                     _scale=v;_custom=true;});_save('scale',v);_save('custom',true);}),
                 ]))),
-              FlSectionHeader(icon:Icons.animation_rounded,title:'动态效果预览'),
+              const FlSectionHeader(icon:Icons.animation_rounded,title:'动态效果预览'),
               FlCard(child:Padding(padding:const EdgeInsets.all(16),
                 child:Column(children:[
                   Row(children:[const Text('页面切换',style:TextStyle(fontSize:16,
@@ -514,7 +514,7 @@ class _FlClashThemeGalleryState extends State<FlClashThemeGallery> {
                           child:BackdropFilter(filter:ImageFilter.blur(
                             sigmaX:_glass==2?16:6,sigmaY:_glass==2?16:6),
                             child:Container(color:Colors.white.withValues(
-                              alpha:_glass==2?.38:.70),
+                              alpha: _glass == 2 ? 0.38 : 0.70),
                               padding:const EdgeInsets.symmetric(horizontal:10,vertical:5),
                               child:const Text('Glass',style:TextStyle(fontSize:11)))))),
                     ])),
