@@ -1,4 +1,4 @@
-name: Axon FlClash UI-only APK
+name: Axon FlClash UI v4 APK
 
 on:
   workflow_dispatch:
@@ -118,8 +118,8 @@ jobs:
           flutter build apk --release --target-platform android-arm64 2>&1 | tee "${RUNNER_TEMP}/axon-build.log"
           test -s build/app/outputs/flutter-apk/app-release.apk
           mkdir -p dist
-          cp build/app/outputs/flutter-apk/app-release.apk dist/Axon-FlClash-UI-only-arm64-v3.apk
-          (cd dist && sha256sum Axon-FlClash-UI-only-arm64-v3.apk > SHA256SUMS.txt)
+          cp build/app/outputs/flutter-apk/app-release.apk dist/Axon-FlClash-UI-only-arm64-v4.apk
+          (cd dist && sha256sum Axon-FlClash-UI-only-arm64-v4.apk > SHA256SUMS.txt)
           ls -lh dist/
 
       - name: Upload APK to GitHub Artifacts

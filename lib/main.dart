@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'axon_flclash_ui.dart';
 import 'src/coverage_gallery.dart';
+import 'src/flclash_theme_gallery.dart';
 
 void main() => runApp(const AxonDemoApp());
 
@@ -54,9 +55,25 @@ class _AxonDemoAppState extends State<AxonDemoApp> {
     theme: axonTheme(seed: _seed),
     darkTheme: axonTheme(brightness: Brightness.dark, seed: _seed),
     themeMode: _mode,
-    home: AxonGalleryHome(
+    home: Builder(builder: (homeContext) => FlClashThemeGallery(
       store: _persistentStore,
       mode: _mode, seed: _seed,
+      onOpenControls: () => Navigator.of(homeContext).push(
+        PageRouteBuilder<void>(
+          transitionDuration: const Duration(milliseconds: 320),
+          reverseTransitionDuration: const Duration(milliseconds: 250),
+          pageBuilder: (_, animation, secondaryAnimation) => AxonGalleryHome(
+            store: _persistentStore, mode: _mode, seed: _seed,
+            onThemeChanged: (v) {setState(() => _mode = v);
+              _persistentStore.setValue('theme_mode', v.name);},
+            onSeedChanged: (v) {setState(() => _seed = v);
+              _persistentStore.setValue('theme_seed', v.toARGB32());}),
+          transitionsBuilder: (_, anim, secondary, child) =>
+            FadeTransition(opacity: anim, child: SlideTransition(
+              position: Tween<Offset>(begin: const Offset(.06, 0),
+                end: Offset.zero).animate(CurvedAnimation(
+                  parent: anim, curve: Curves.easeOutCubic)),child: child)),
+        )),
       onThemeChanged: (v) {
         setState(() => _mode = v);
         _persistentStore.setValue('theme_mode', v.name);
@@ -65,7 +82,7 @@ class _AxonDemoAppState extends State<AxonDemoApp> {
         setState(() => _seed = v);
         _persistentStore.setValue('theme_seed', v.toARGB32());
       },
-    ),
+    )),
   );
 }
 

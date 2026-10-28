@@ -1,3 +1,5 @@
+> **v4: FlClash Theme 视觉重构**：APK 默认首页已换成 FlClash 主题设置交互界面；详见 [视觉重构说明](docs/FLCLASH_VISUAL_REBUILD_CN.md)。原有 Axon 控件库从页面右上角进入。
+
 # Axon × FlClash · 纯 Flutter/Dart UI 控件库 v3
 
 **本轮仅扩充 UI：不增加真实按键、手柄、触控注入、驱动或原生输入逻辑。**

@@ -16,3 +16,5 @@ export 'src/advanced_controls.dart';
 export 'src/plugin_schema_ui.dart';
 export 'src/ui_extras.dart';
 export 'src/ui_extras_gallery.dart';
+
+export 'src/flclash_theme_gallery.dart';
