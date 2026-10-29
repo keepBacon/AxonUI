@@ -36,11 +36,11 @@ class _ThumbPainter extends CustomPainter {
     box(8, 13, 14, 4, accent.withValues(alpha: .8), 2);
     box(8, 20, 34, 1.5, ink.withValues(alpha: .30), 1);
     box(5, 26, 42, 5, card, 2);
-    for (var i=0;i<4;i++) box(9+i*9.5, 27.5, 5, 2, i==1 ? accent : ink.withValues(alpha:.35),1);
-    if (floating) box(9, 32, 34, 5, glass>0 ? accent.withValues(alpha:.28):card, 3);
-    else box(0, 32, s.width, 6, card, 0);
-    if (slide) box(22, 32.8, 7, 3.7, accent.withValues(alpha:.6),3);
-    else box(24, 33, 4, 4, accent,3);
+    for (var i=0;i<4;i++) { box(9+i*9.5, 27.5, 5, 2, i==1 ? accent : ink.withValues(alpha:.35),1); }
+    if (floating) { box(9, 32, 34, 5, glass>0 ? accent.withValues(alpha:.28):card, 3); }
+    else { box(0, 32, s.width, 6, card, 0); }
+    if (slide) { box(22, 32.8, 7, 3.7, accent.withValues(alpha:.6),3); }
+    else { box(24, 33, 4, 4, accent,3); }
     if (glass==2) box(11, 32.4, 30, 1, Colors.white.withValues(alpha:.5),1);
   }
   @override
@@ -120,17 +120,42 @@ class _FlLivePreviewState extends State<FlLivePreview> {
               decoration: BoxDecoration(color:widget.glass==0?card:
                 card.withValues(alpha:widget.glass == 1 ? 0.78 : 0.55),
                 borderRadius:BorderRadius.circular(widget.floating?20:5)),
-              child:Row(children:[for(var i=0;i<4;i++) Expanded(child:InkWell(
-                onTap:()=>setState(()=>selected=i),
-                key:ValueKey('preview-tab-$i'),
-                child:Center(child:AnimatedContainer(
-                  duration:FlMotion.effective(context),
-                  width:i==selected?26:18,height:22,
-                  decoration:BoxDecoration(color:i==selected?widget.accent.withValues(alpha:.22):Colors.transparent,
-                    borderRadius:BorderRadius.circular(13)),
-                  child:Icon([Icons.dashboard_outlined,Icons.tune_rounded,
-                    Icons.layers_outlined,Icons.palette_outlined][i],
-                    size:13,color:i==selected?widget.accent:fg.withValues(alpha:.4)))))]),
+              child: Row(
+                children: [
+                  for (var i = 0; i < 4; i++)
+                    Expanded(
+                      child: InkWell(
+                        key: ValueKey('preview-tab-$i'),
+                        onTap: () => setState(() => selected = i),
+                        child: Center(
+                          child: AnimatedContainer(
+                            duration: FlMotion.effective(context),
+                            width: i == selected ? 26 : 18,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              color: i == selected
+                                  ? widget.accent.withValues(alpha: .22)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(13),
+                            ),
+                            child: Icon(
+                              [
+                                Icons.dashboard_outlined,
+                                Icons.tune_rounded,
+                                Icons.layers_outlined,
+                                Icons.palette_outlined,
+                              ][i],
+                              size: 13,
+                              color: i == selected
+                                  ? widget.accent
+                                  : fg.withValues(alpha: .4),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ])),
       ),

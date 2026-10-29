@@ -32,7 +32,7 @@ void main(){
     expect(chosen,'淡入');
   });
   testWidgets('Declarative schema is strictly UI only',(tester)async{
-    await tester.pumpWidget(MaterialApp(home:Scaffold(body:SingleChildScrollView(
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(body:SingleChildScrollView(
       child:FlSchemaPanel(features:[{'id':'a','name':'界面','type':'toggle',
         'debug':[{'id':'show','name':'显示','type':'toggle','default':true}]}])))));
     await tester.pumpAndSettle();

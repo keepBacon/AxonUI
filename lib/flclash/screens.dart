@@ -76,10 +76,10 @@ class _FlThemeScreenState extends State<FlThemeScreen>{
             style:TextStyle(color:flMuted(context),fontSize:12)),
         ])),
         const FlSection(title:'外观模式',icon:Icons.dark_mode_outlined),
-        FlChoiceGroup<ThemeMode>(value:widget.mode,choices:[
-          const FlChoice(ThemeMode.system,'跟随系统',preview:FlScreenThumb()),
-          const FlChoice(ThemeMode.light,'浅色',preview:FlScreenThumb()),
-          const FlChoice(ThemeMode.dark,'深色',preview:FlScreenThumb(dark:true)),
+        FlChoiceGroup<ThemeMode>(value:widget.mode,choices:const [
+          FlChoice(ThemeMode.system,'跟随系统',preview:FlScreenThumb()),
+          FlChoice(ThemeMode.light,'浅色',preview:FlScreenThumb()),
+          FlChoice(ThemeMode.dark,'深色',preview:FlScreenThumb(dark:true)),
         ],onChanged:widget.onMode),
         const FlSection(title:'主题色',icon:Icons.palette_outlined),
         FlPanel(child:FlColorSwatches(colors:_colors,value:widget.seed,
