@@ -130,7 +130,7 @@ class _FlLivePreviewState extends State<FlLivePreview> {
                     borderRadius:BorderRadius.circular(13)),
                   child:Icon([Icons.dashboard_outlined,Icons.tune_rounded,
                     Icons.layers_outlined,Icons.palette_outlined][i],
-                    size:13,color:i==selected?widget.accent:fg.withValues(alpha:.4)))))])),
+                    size:13,color:i==selected?widget.accent:fg.withValues(alpha:.4)))))]),
             ),
           ])),
       ),

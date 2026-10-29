@@ -1,7 +1,6 @@
 import 'dart:ui' show ImageFilter;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'controls.dart';
 import 'screens.dart';
 import 'store.dart';
 import 'theme.dart';
@@ -64,7 +63,7 @@ class FlNavigationShell extends StatefulWidget {
 }
 class _FlNavigationShellState extends State<FlNavigationShell>{
   int _selected=0;
-  bool _floating=true;
+  final bool _floating=true;
   @override
   Widget build(BuildContext context){
     final scheme=Theme.of(context).colorScheme;

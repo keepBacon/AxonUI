@@ -9,6 +9,10 @@ fi
 TARGET='android/app/src/main/kotlin/com/axon/axon_flclash_flutter/MainActivity.kt'
 mkdir -p "$(dirname "$TARGET")"
 cp scripts/MainActivity.kt "$TARGET"
+# Flutter create may add an obsolete MyApp example test; this project owns its tests.
+if [[ -f test/widget_test.dart ]] && grep -q 'MyApp' test/widget_test.dart; then
+  rm test/widget_test.dart
+fi
 # Only mutate the Flutter-generated Android host. No existing Axon app files are used.
 python3 - <<'PY_ANDROID'
 from pathlib import Path

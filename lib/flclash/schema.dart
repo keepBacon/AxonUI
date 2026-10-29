@@ -117,7 +117,7 @@ class _FlSchemaPanelState extends State<FlSchemaPanel> {
                   if(result!=null){final next=[...rows];next[i]={...entry,field['id'].toString():result};
                     change(next);}
                 }
-              })]))),
+              })])),
           if(rows.isEmpty)Text('暂无条目',style:TextStyle(color:flMuted(context))),
         ]));
       default:return FlGroup(children:[FlSettingRow(title:title,subtitle:'暂不支持：$type')]);
