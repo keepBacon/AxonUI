@@ -84,7 +84,7 @@ class _FlLivePreviewState extends State<FlLivePreview> {
               decoration: BoxDecoration(color: fg.withValues(alpha:.20),
                 borderRadius: BorderRadius.circular(9))), const Spacer(),
               Icon(Icons.more_horiz, size: 12, color: fg)]),
-            const SizedBox(height: 18),
+            const SizedBox(height: 12),
             Expanded(child: ClipRect(child: AnimatedSwitcher(
               duration: FlMotion.effective(context, const Duration(milliseconds: 340)),
               switchInCurve: Curves.easeOutCubic,
@@ -99,7 +99,7 @@ class _FlLivePreviewState extends State<FlLivePreview> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(label, style: TextStyle(color: fg,fontSize:16,fontWeight:FontWeight.bold)),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   Container(height: 52, decoration: BoxDecoration(color: card,
                     borderRadius: BorderRadius.circular(12)),
                     child: Center(child: Row(mainAxisAlignment: MainAxisAlignment.center,
@@ -107,9 +107,9 @@ class _FlLivePreviewState extends State<FlLivePreview> {
                         Icon(Icons.auto_awesome_rounded, size:18, color:widget.accent),
                         const SizedBox(width:6), Text('Axon UI', style:TextStyle(fontSize:11,color:fg)),
                       ]))),
-                  const SizedBox(height: 9),
+                  const SizedBox(height: 6),
                   for (var i=0;i<3;i++) Padding(padding: const EdgeInsets.only(bottom:6),
-                    child: Container(height: 32, decoration: BoxDecoration(color:card,
+                    child: Container(height: 24, decoration: BoxDecoration(color:card,
                       borderRadius:BorderRadius.circular(9)),
                       child: Row(children:[const SizedBox(width:8),CircleAvatar(
                         radius:6,backgroundColor: widget.accent.withValues(alpha:.55)),

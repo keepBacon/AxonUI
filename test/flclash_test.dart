@@ -16,6 +16,10 @@ void main(){
       find.text('固定'), 240,
       scrollable: find.byType(Scrollable).first,
     );
+    // scrollUntilVisible can stop when a lazily built child is still in
+    // viewport cache extent. Bring it completely on-screen before tapping.
+    await tester.ensureVisible(find.text('固定'));
+    await tester.pumpAndSettle();
     expect(find.byType(FlChoiceGroup<bool>), findsWidgets);
     await tester.tap(find.text('固定'));
     await tester.pumpAndSettle();
