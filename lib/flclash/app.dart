@@ -1,9 +1,9 @@
-import 'dart:ui' show ImageFilter;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'screens.dart';
 import 'store.dart';
 import 'theme.dart';
+import 'glass.dart';
 
 class FlClashAxonApp extends StatefulWidget {
   const FlClashAxonApp({super.key,this.store});
@@ -17,6 +17,7 @@ class _FlClashAxonAppState extends State<FlClashAxonApp>{
       ? const FlAndroidStore() : FlMemoryStore());
   ThemeMode _mode=ThemeMode.system;
   Color _seed=FlTokens.blue;
+  int _glass=2;
   bool _themeOpen=true;
   @override
   void initState(){super.initState();_load();}
@@ -26,6 +27,7 @@ class _FlClashAxonAppState extends State<FlClashAxonApp>{
         final mode=data['theme_mode']?.toString();
         for(final candidate in ThemeMode.values){if(candidate.name==mode)_mode=candidate;}
         final raw=data['theme_seed'];if(raw is int)_seed=Color(raw);
+        final glass=data['glass'];if(glass is int)_glass=glass.clamp(0,2);
       });
     }catch(_){/* Display app remains useful without native prefs. */}
   }
@@ -35,22 +37,27 @@ class _FlClashAxonAppState extends State<FlClashAxonApp>{
   void _setSeed(Color value){
     setState(()=>_seed=value);_store.save('theme_seed',value.toARGB32());
   }
+  void _setGlass(int level){
+    final next=level.clamp(0,2);
+    setState(()=>_glass=next);
+    _store.save('glass',next);
+  }
   @override
   Widget build(BuildContext context)=>MaterialApp(
     title:'Axon UI · FlClash',debugShowCheckedModeBanner:false,
-    theme:flTheme(brightness:Brightness.light,seed:_seed),
-    darkTheme:flTheme(brightness:Brightness.dark,seed:_seed),
+    theme:flTheme(brightness:Brightness.light,seed:_seed,glass:_glass),
+    darkTheme:flTheme(brightness:Brightness.dark,seed:_seed,glass:_glass),
     themeMode:_mode,
-    home:AnimatedSwitcher(
+    home:FlGlassScope(level:_glass,child:FlAmbientBackdrop(level:_glass,child:AnimatedSwitcher(
       duration:const Duration(milliseconds:260),
       switchInCurve:Curves.easeOutCubic,
       child:_themeOpen
         ? FlThemeScreen(key:const ValueKey('theme'),
           onBack:()=>setState(()=>_themeOpen=false),mode:_mode,seed:_seed,
-          onMode:_setMode,onSeed:_setSeed,store:_store)
+          onMode:_setMode,onSeed:_setSeed,glass:_glass,onGlass:_setGlass,store:_store)
         : FlNavigationShell(key:const ValueKey('shell'),
           openTheme:()=>setState(()=>_themeOpen=true)),
-    ),
+    ))),
   );
 }
 
@@ -83,14 +90,8 @@ class _FlNavigationShellState extends State<FlNavigationShell>{
         child:KeyedSubtree(key:ValueKey('page-$_selected'),child:pages[_selected]),
       )),
       Positioned(left:18,right:18,bottom:14,
-        child:ClipRRect(borderRadius:BorderRadius.circular(_floating?30:18),
-          child:BackdropFilter(filter:ImageFilter.blur(sigmaX:15,sigmaY:15),
-            child:Container(
-              decoration:BoxDecoration(
-                color:flSurface(context).withValues(alpha:.88),
-                borderRadius:BorderRadius.circular(_floating?30:18),
-                border:Border.all(color:scheme.outlineVariant.withValues(alpha:.4))),
-              padding:const EdgeInsets.all(7),
+        child:FlGlassSurface(radius:_floating?30:18,shadow:true,
+          child:Padding(padding:const EdgeInsets.all(7),
               child:Row(children:[
                 for(var i=0;i<4;i++) Expanded(child:InkWell(
                   key:ValueKey('tab-$i'),
@@ -118,8 +119,8 @@ class _FlNavigationShellState extends State<FlNavigationShell>{
                           color:i==_selected?scheme.primary:flMuted(context))),
                     ])),
                 )),
-              ])),
-          ))),
+              ]))),
+        ),
     ])));
   }
 }

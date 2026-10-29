@@ -4,13 +4,17 @@ import 'preview.dart';
 import 'schema.dart';
 import 'store.dart';
 import 'theme.dart';
+import 'glass.dart';
 
 class FlThemeScreen extends StatefulWidget {
   const FlThemeScreen({super.key, required this.onBack, required this.mode,
-    required this.seed, required this.onMode, required this.onSeed,required this.store});
+    required this.seed, required this.onMode, required this.onSeed,
+    required this.glass, required this.onGlass, required this.store});
   final VoidCallback onBack;
   final ThemeMode mode;
   final Color seed;
+  final int glass;
+  final ValueChanged<int> onGlass;
   final ValueChanged<ThemeMode> onMode;
   final ValueChanged<Color> onSeed;
   final FlUiStore store;
@@ -19,7 +23,8 @@ class FlThemeScreen extends StatefulWidget {
 }
 class _FlThemeScreenState extends State<FlThemeScreen>{
   bool _floating=true,_slide=true,_custom=false;
-  int _glass=2,_colorStyle=0;
+  int _colorStyle=0;
+  int get _glass => widget.glass;
   double _scale=1;
   String _font='跟随系统';
   final _colors=<Color>[
@@ -35,7 +40,6 @@ class _FlThemeScreenState extends State<FlThemeScreen>{
         _floating=data['floating'] is bool?data['floating'] as bool:_floating;
         _slide=data['slide'] is bool?data['slide'] as bool:_slide;
         _custom=data['custom_scale'] is bool?data['custom_scale'] as bool:_custom;
-        _glass=data['glass'] is int?data['glass'] as int:_glass;
         _colorStyle=data['color_style'] is int?data['color_style'] as int:_colorStyle;
         _scale=data['text_scale'] is num?(data['text_scale'] as num).toDouble():_scale;
         _font=data['font']?.toString()??_font;
@@ -60,7 +64,8 @@ class _FlThemeScreenState extends State<FlThemeScreen>{
             fontWeight:FontWeight.w700))),
           IconButton.filledTonal(tooltip:'重置主题',onPressed:(){
             widget.onMode(ThemeMode.system);widget.onSeed(FlTokens.blue);
-            setState((){_floating=true;_slide=true;_glass=2;_custom=false;
+            widget.onGlass(2);
+            setState((){_floating=true;_slide=true;_custom=false;
               _colorStyle=0;_scale=1;_font='跟随系统';});
           },icon:const Icon(Icons.restart_alt_rounded)),
         ])),
@@ -110,7 +115,10 @@ class _FlThemeScreenState extends State<FlThemeScreen>{
           FlChoice(0,'无',preview:FlScreenThumb(accent:widget.seed,glass:0)),
           FlChoice(1,'标准',preview:FlScreenThumb(accent:widget.seed,glass:1)),
           FlChoice(2,'极致',preview:FlScreenThumb(accent:widget.seed,glass:2)),
-        ],onChanged:(v){setState(()=>_glass=v);_save('glass',v);}),
+        ],onChanged:widget.onGlass),
+        Padding(padding:const EdgeInsets.only(top:8),child:Text(
+          '实时毛玻璃材质：标准与极致使用不同的背景模糊及玻璃边缘高光。',
+          style:TextStyle(fontSize:12,color:flMuted(context)))),
         const FlSection(title:'字体',icon:Icons.font_download_outlined),
         FlGroup(children:[FlSettingRow(title:_font,leading:const Text('Aa',
           style:TextStyle(fontWeight:FontWeight.bold,fontSize:23)),

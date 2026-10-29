@@ -20,7 +20,7 @@ abstract final class FlMotion {
       MediaQuery.disableAnimationsOf(context) ? Duration.zero : preferred;
 }
 
-ThemeData flTheme({required Brightness brightness, required Color seed}) {
+ThemeData flTheme({required Brightness brightness, required Color seed, int glass = 0}) {
   final dark = brightness == Brightness.dark;
   final scheme = ColorScheme.fromSeed(seedColor: seed, brightness: brightness);
   final bg = dark ? const Color(0xFF14151B) : FlTokens.backgroundLight;
@@ -29,7 +29,7 @@ ThemeData flTheme({required Brightness brightness, required Color seed}) {
     useMaterial3: true,
     brightness: brightness,
     colorScheme: scheme,
-    scaffoldBackgroundColor: bg,
+    scaffoldBackgroundColor: glass == 0 ? bg : Colors.transparent,
     canvasColor: bg,
     cardColor: card,
     splashFactory: InkRipple.splashFactory,

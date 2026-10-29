@@ -58,6 +58,25 @@ void main(){
     expect(find.text('配置'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('Glass modes control real BackdropFilter surfaces',(tester) async {
+    await tester.pumpWidget(const MaterialApp(
+      home: Scaffold(body: FlGlassScope(level: 0,
+        child: FlPanel(child: Text('Glass test')))),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.byType(BackdropFilter), findsNothing);
+    await tester.pumpWidget(const MaterialApp(
+      home: Scaffold(body: FlGlassScope(level: 2,
+        child: FlPanel(child: Text('Glass test')))),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.byType(BackdropFilter), findsWidgets);
+    final surface = tester.widget<FlGlassSurface>(
+      find.byType(FlGlassSurface).first,
+    );
+    expect(surface.level, isNull); // level is inherited from scope
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('Segmented choice updates locally',(tester)async{
     var chosen='滑动';
     await tester.pumpWidget(MaterialApp(home:Scaffold(body:StatefulBuilder(

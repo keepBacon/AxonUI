@@ -5,6 +5,7 @@ A **complete UI-layer rewrite**, using FlClash's grouping, generous rounded surf
 ## Architecture
 
 - `lib/flclash/theme.dart` — design tokens, Material 3 themes, motion timings.
+- `lib/flclash/glass.dart` — native BackdropFilter frost, tiered tint, rim highlights and ambient backdrop. A visual approximation **not** an upstream shader/refraction port.
 - `lib/flclash/controls.dart` — grouped settings, preview choices, switches, segmented controls, color swatches, sliders, bottom sheets, local reorder.
 - `lib/flclash/preview.dart` — self-drawn miniature UI preview and interactive phone motion demo.
 - `lib/flclash/schema.dart` — Axon-style declarative UI schema rendered with the *new* FlClash components; no feature execution.
@@ -28,6 +29,10 @@ flutter build apk --release --target-platform android-arm64
 ```
 
 `Flutter 3.47.7` and `Java 17` are pinned in CI.
+
+## Glass renderer accuracy
+
+The mode switch now updates real UI panes, sheets and the navigation bar and persists between launches. The off/standard/ultra settings control native backdrop blur (none / 9 / 19), opacity, tint and specular rim. This is a Flutter-native **frosted-glass approximation**, not byte-equivalent FlClash Liquid Glass: upstream additionally uses a fragment shader, captured render layers and optical refraction. No claim of exact optical parity is made.
 
 ## Licensing
 
