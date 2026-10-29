@@ -10,7 +10,7 @@ import io.flutter.plugin.common.MethodChannel
  * Does not modify settings or control engine in the real Axon application.
  */
 class MainActivity : FlutterActivity() {
-    private val channelName = "com.axon.input/flutter_ui"
+    private val channelName = "com.axon.ui/preferences"
     private val prefsName = "axon_flclash_ui_demo"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {

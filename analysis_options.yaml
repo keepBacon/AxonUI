@@ -1,7 +1,5 @@
 include: package:flutter_lints/flutter.yaml
 analyzer:
   exclude:
-    - flclash_original_ui_reference/**
     - .ci-unpacked/**
-  errors:
-    invalid_use_of_visible_for_testing_member: warning
+    - build/**

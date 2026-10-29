@@ -1,9 +1,9 @@
 name: axon_flclash_flutter
-description: Axon FlClash-style fully interactive UI-only Flutter controls for Axon.
+description: A Flutter UI-only FlClash-inspired component system for Axon UI.
 publish_to: none
-version: 4.0.0+4
+version: 5.0.0+5
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: '>=3.5.0 <4.0.0'
 dependencies:
   flutter:
     sdk: flutter
