@@ -68,8 +68,12 @@ class _FlLivePreviewState extends State<FlLivePreview> {
     final bg = widget.dark ? const Color(0xFF20242E) : const Color(0xFFF0F1F6);
     final card = widget.dark ? const Color(0xFF343844) : Colors.white;
     final label = ['总览', '控件', '配置', '主题'][selected];
-    return Center(child: SizedBox(width: 175, child: AspectRatio(
-      aspectRatio: .58,
+    // Lay out the miniature screen at its design size, then scale as a whole.
+    // This keeps animated content within 234px preview panels on small phones
+    // and avoids RenderFlex overflows during AnimatedSwitcher transitions.
+    return Center(child: FittedBox(
+      fit: BoxFit.contain,
+      child: SizedBox(width: 175, height: 300,
       child: AnimatedContainer(duration: FlMotion.effective(context),
         decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(22),
           boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:.12), blurRadius: 20)]),

@@ -9,7 +9,22 @@ void main(){
     expect(find.text('主题'),findsWidgets);
     expect(find.text('外观模式'),findsOneWidget);
     expect(find.text('浅色'),findsOneWidget);
-    expect(find.byType(FlChoiceGroup<bool>),findsWidgets);
+    // The first choice group is initially mounted in the visible viewport.
+    expect(find.byType(FlChoiceGroup<ThemeMode>), findsOneWidget);
+    // Lower sections are created lazily by ListView; scroll before checking.
+    await tester.scrollUntilVisible(
+      find.text('固定'), 240,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.byType(FlChoiceGroup<bool>), findsWidgets);
+    await tester.tap(find.text('固定'));
+    await tester.pumpAndSettle();
+    final row = tester.widget<FlSettingRow>(
+      find.ancestor(
+        of: find.text('固定'), matching: find.byType(FlSettingRow),
+      ).first,
+    );
+    expect(row.selected, isTrue);
   });
   testWidgets('Navigation exposes freshly rebuilt FlClash controls',(tester)async{
     await tester.pumpWidget(FlClashAxonApp(store:FlMemoryStore()));
@@ -21,6 +36,23 @@ void main(){
     await tester.pumpAndSettle();
     expect(find.text('控件'),findsWidgets);
     expect(find.byType(FlToggleRow),findsWidgets);
+  });
+  testWidgets('Live miniature preview fits short panels and animates tabs',(tester)async{
+    await tester.pumpWidget(const MaterialApp(
+      home: Scaffold(body: SizedBox(
+        height: 234,
+        child: FlLivePreview(
+          accent: Colors.blue, floating: true,
+          slide: true, glass: 2, dark: false,
+        ),
+      )),
+    ));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    await tester.tap(find.byKey(const ValueKey('preview-tab-2')));
+    await tester.pumpAndSettle();
+    expect(find.text('配置'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
   testWidgets('Segmented choice updates locally',(tester)async{
     var chosen='滑动';
