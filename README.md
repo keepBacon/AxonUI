@@ -10,7 +10,8 @@ A **complete UI-layer rewrite**, using FlClash's grouping, generous rounded surf
 - `lib/flclash/preview.dart` — self-drawn miniature UI preview and interactive phone motion demo.
 - `lib/flclash/schema.dart` — Axon-style declarative UI schema rendered with the *new* FlClash components; no feature execution.
 - `lib/flclash/screens.dart` — rebuilt theme, overview, controls and profile interfaces.
-- `lib/flclash/app.dart` — animation-aware application shell and bottom navigation.
+- `lib/flclash/app.dart` — sequential page transitions avoiding simultaneous outgoing/incoming text.
+- `lib/flclash/dock.dart` — travelling selection lens, continuous touch following, shader lens on lift and material preview.
 - `lib/flclash/store.dart` — optional display-preference storage only.
 
 **All legacy Axon widget implementations and earlier v1–v4 galleries were removed from the active source tree.** No input injection, interception, overlay engine, native gamepad logic or key execution is included.
@@ -32,7 +33,7 @@ flutter build apk --release --target-platform android-arm64
 
 ## Glass renderer accuracy
 
-The switch uses the original FlClash optical glass engine for floating navigation. Standard and ultra select official render quality. Regular settings cards stay opaque. Shader effects require device/Impeller support.
+The switch uses the original FlClash optical glass engine for floating navigation. Standard and ultra select official render quality. A contrast glass preview makes optical effects inspectable. Regular settings cards stay opaque. Shader effects require device/Impeller support.
 
 ## Licensing
 

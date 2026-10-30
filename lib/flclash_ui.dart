@@ -4,6 +4,7 @@ export 'flclash/theme.dart';
 export 'flclash/glass.dart';
 export 'flclash/upstream_liquid_glass.dart';
 export 'flclash/controls.dart';
+export 'flclash/dock.dart';
 export 'flclash/preview.dart';
 export 'flclash/schema.dart';
 export 'flclash/store.dart';

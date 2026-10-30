@@ -4,6 +4,7 @@ import 'screens.dart';
 import 'store.dart';
 import 'theme.dart';
 import 'glass.dart';
+import 'dock.dart';
 import 'upstream_liquid_glass.dart';
 
 class FlClashAxonApp extends StatefulWidget {
@@ -55,7 +56,8 @@ class _FlClashAxonAppState extends State<FlClashAxonApp>{
       child:FlGlassScope(level:_glass,
       child:FlAmbientBackdrop(level:_glass,child:AnimatedSwitcher(
       duration:const Duration(milliseconds:260),
-      switchInCurve:Curves.easeOutCubic,
+      switchInCurve:const Interval(.5,1,curve:Curves.easeOutCubic),
+      switchOutCurve:const Interval(.5,1,curve:Curves.easeInCubic),
       child:_themeOpen
         ? FlThemeScreen(key:const ValueKey('theme'),
           onBack:()=>setState(()=>_themeOpen=false),mode:_mode,seed:_seed,
@@ -75,10 +77,8 @@ class FlNavigationShell extends StatefulWidget {
 }
 class _FlNavigationShellState extends State<FlNavigationShell>{
   int _selected=0;
-  final bool _floating=true;
   @override
   Widget build(BuildContext context){
-    final scheme=Theme.of(context).colorScheme;
     final pages=<Widget>[
       FlOverviewScreen(openTheme:widget.openTheme),
       const FlControlsScreen(),
@@ -87,45 +87,29 @@ class _FlNavigationShellState extends State<FlNavigationShell>{
     return Scaffold(body:SafeArea(child:Stack(children:[
       Positioned.fill(child:AnimatedSwitcher(
         duration:FlMotion.effective(context,FlMotion.page),
+        switchInCurve:const Interval(.5,1,curve:Curves.easeOutCubic),
+        switchOutCurve:const Interval(.5,1,curve:Curves.easeInCubic),
         transitionBuilder:(child,animation)=>FadeTransition(
           opacity:animation,child:SlideTransition(
-            position:Tween(begin:const Offset(.045,0),end:Offset.zero)
-              .animate(CurvedAnimation(parent:animation,curve:FlMotion.curve)),
+            position:Tween(begin:const Offset(.035,0),end:Offset.zero)
+              .animate(animation),
             child:child)),
         child:KeyedSubtree(key:ValueKey('page-$_selected'),child:pages[_selected]),
       )),
       Positioned(left:18,right:18,bottom:14,
-        child:FlGlassSurface(radius:_floating?30:18,shadow:true,pill:true,
-          child:Padding(padding:const EdgeInsets.all(7),
-              child:Row(children:[
-                for(var i=0;i<4;i++) Expanded(child:InkWell(
-                  key:ValueKey('tab-$i'),
-                  borderRadius:BorderRadius.circular(23),
-                  onTap:(){
-                    if(i==3){widget.openTheme();return;}
-                    setState(()=>_selected=i);
-                  },
-                  child:AnimatedContainer(
-                    height:56,duration:FlMotion.effective(context),
-                    curve:FlMotion.curve,
-                    decoration:BoxDecoration(
-                      color:i==_selected?scheme.primaryContainer:Colors.transparent,
-                      borderRadius:BorderRadius.circular(22)),
-                    child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[
-                      AnimatedScale(scale:i==_selected?1.06:1.0,
-                        duration:FlMotion.effective(context,FlMotion.short),
-                        child:Icon([Icons.dashboard_rounded,Icons.tune_rounded,
-                          Icons.folder_outlined,Icons.palette_outlined][i],
-                          size:22,color:i==_selected?scheme.primary:flMuted(context))),
-                      const SizedBox(height:2),
-                      Text(['概览','控件','配置','主题'][i],
-                        style:TextStyle(fontSize:11,
-                          fontWeight:i==_selected?FontWeight.w700:FontWeight.w400,
-                          color:i==_selected?scheme.primary:flMuted(context))),
-                    ])),
-                )),
-              ]))),
-        ),
+        child:FlLiquidNavigationDock(
+          selectedIndex:_selected,
+          destinations:const [
+            FlDockDestination(Icons.dashboard_rounded,'概览'),
+            FlDockDestination(Icons.tune_rounded,'控件'),
+            FlDockDestination(Icons.folder_outlined,'配置'),
+            FlDockDestination(Icons.palette_outlined,'主题'),
+          ],
+          onSelected:(i){
+            if(i==3){widget.openTheme();return;}
+            if(i!=_selected)setState(()=>_selected=i);
+          },
+        )),
     ])));
   }
 }

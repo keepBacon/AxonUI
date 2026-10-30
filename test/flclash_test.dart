@@ -88,6 +88,27 @@ void main(){
     expect(find.byType(LiquidGlass), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('Glass dock selection lens responds to taps',(tester) async {
+    var chosen = 0;
+    await tester.pumpWidget(MaterialApp(home: Scaffold(
+      body: StatefulBuilder(builder: (context, set) => Center(
+        child: SizedBox(width: 340, child: FlLiquidNavigationDock(
+          selectedIndex: chosen,
+          destinations: const [
+            FlDockDestination(Icons.home_outlined, '总览'),
+            FlDockDestination(Icons.settings_outlined, '设置'),
+            FlDockDestination(Icons.palette_outlined, '主题'),
+          ],
+          onSelected: (index) => set(() => chosen = index),
+        )),
+      )),
+    )));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('tab-1')));
+    await tester.pumpAndSettle();
+    expect(chosen, 1);
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('Segmented choice updates locally',(tester)async{
     var chosen='滑动';
     await tester.pumpWidget(MaterialApp(home:Scaffold(body:StatefulBuilder(

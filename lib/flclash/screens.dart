@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'controls.dart';
+import 'dock.dart';
 import 'preview.dart';
 import 'schema.dart';
 import 'store.dart';
@@ -115,6 +116,8 @@ class _FlThemeScreenState extends State<FlThemeScreen>{
           FlChoice(1,'标准',preview:FlScreenThumb(accent:widget.seed,glass:1)),
           FlChoice(2,'极致',preview:FlScreenThumb(accent:widget.seed,glass:2)),
         ],onChanged:widget.onGlass),
+        const SizedBox(height:14),
+        FlGlassMaterialPreview(level:_glass),
         Padding(padding:const EdgeInsets.only(top:8),child:Text(
           '光学液态玻璃：官方 Shader 与背景捕获系统应用于悬浮导航。',
           style:TextStyle(fontSize:12,color:flMuted(context)))),
