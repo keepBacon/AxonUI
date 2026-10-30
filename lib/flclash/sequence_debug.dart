@@ -68,7 +68,7 @@ class _FlColorSequenceDebugState extends State<FlColorSequenceDebug> {
                       color:ThemeData.estimateBrightnessForColor(stops[i])
                         ==Brightness.dark?Colors.white:Colors.black))),
                 )),
-              )),
+              ),
         ])),
       const SizedBox(height:7),
       Wrap(spacing:6,children:[
