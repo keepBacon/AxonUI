@@ -35,6 +35,8 @@ jobs:
         run: flutter analyze --no-fatal-infos
       - name: Widget tests
         run: flutter test --reporter expanded
+      - name: Install verified Android NDK (retry transient downloads)
+        run: bash scripts/install_android_ndk.sh
       - name: Build ARM64 release APK
         run: |
           set -euo pipefail
