@@ -22,17 +22,36 @@ void main(){
     expect(find.byKey(const ValueKey('entry-arrow-自定义')),findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('entry-arrow-自定义')));
     await tester.pumpAndSettle();
-    expect(find.text('颜色与材质'),findsOneWidget);
-    final row=find.byKey(const ValueKey('debug-arrow-颜色调试'));
+    // The feature catalogue uses a lazily built ListView. Sections farther
+    // down do not exist until its Scrollable is scrolled into view.
+    final groups = find.byType(FlFeatureGroupsScreen);
+    expect(groups, findsOneWidget);
+    final list = find.descendant(
+      of: groups,
+      matching: find.byType(Scrollable),
+    );
+    expect(list, findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('颜色与材质'),
+      160,
+      scrollable: list,
+    );
+    expect(find.text('颜色与材质'), findsOneWidget);
+    // Preview parameters must NOT be embedded inline in the catalogue.
+    expect(find.byKey(const ValueKey('color-debug-preview')), findsNothing);
+    final row = find.byKey(const ValueKey('debug-arrow-颜色调试'));
+    await tester.scrollUntilVisible(row, 120, scrollable: list);
     await tester.ensureVisible(row);
+    await tester.pumpAndSettle();
     await tester.tap(row);
     await tester.pumpAndSettle();
-    expect(find.text('颜色调试'),findsWidgets);
-    expect(find.byKey(const ValueKey('color-debug-preview')),findsOneWidget);
+    expect(find.text('颜色调试'), findsWidgets);
+    expect(find.byKey(const ValueKey('color-debug-preview')), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('debug-back')));
     await tester.pumpAndSettle();
-    expect(find.text('颜色与材质'),findsOneWidget);
-    expect(tester.takeException(),isNull);
+    expect(find.text('颜色与材质'), findsOneWidget);
+    expect(find.byKey(const ValueKey('color-debug-preview')), findsNothing);
+    expect(tester.takeException(), isNull);
   });
   testWidgets('Live miniature preview fits short panels and animates tabs',(tester)async{
     await tester.pumpWidget(const MaterialApp(
