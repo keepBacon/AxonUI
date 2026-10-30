@@ -108,9 +108,6 @@ class _FlThemeScreenState extends State<FlThemeScreen>{
         ],onChanged:widget.onGlass),
         const SizedBox(height:14),
         FlGlassMaterialPreview(level:_glass),
-        Padding(padding:const EdgeInsets.only(top:8),child:Text(
-          '光学液态玻璃：官方 Shader 与背景捕获系统应用于悬浮导航。',
-          style:TextStyle(fontSize:12,color:flMuted(context)))),
         const FlSection(title:'字体',icon:Icons.font_download_outlined),
         FlGroup(children:[FlSettingRow(title:_font,leading:const Text('Aa',
           style:TextStyle(fontWeight:FontWeight.bold,fontSize:23)),
@@ -151,14 +148,7 @@ class _FlThemeScreenState extends State<FlThemeScreen>{
           const SizedBox(height:12),
           SizedBox(height:234,child:FlLivePreview(accent:widget.seed,
             floating:_floating,slide:_slide,glass:_glass,dark:dark)),
-          const SizedBox(height:5),
-          Text('点击预览底栏图标体验切换效果',
-            style:TextStyle(color:flMuted(context),fontSize:12)),
         ])),
-        const SizedBox(height:22),
-        Padding(padding:const EdgeInsets.only(bottom:12),child:Center(
-          child:Text('基于 FlClash 视觉体系重构 · 仅 UI 层',
-            style:TextStyle(fontSize:12,color:flMuted(context))))),
       ])),
     ])));
   }
@@ -179,8 +169,6 @@ class _FlControlsScreenState extends State<FlControlsScreen> {
   Widget build(BuildContext context)=>ListView(
     padding:const EdgeInsets.fromLTRB(24,16,24,130),children:[
       const Text('控件',style:TextStyle(fontSize:29,fontWeight:FontWeight.bold)),
-      const SizedBox(height:7),Text('所有值只用于 UI 演示，不连接实际按键或触控逻辑',
-        style:TextStyle(color:flMuted(context))),
       const FlSection(title:'显示设置',icon:Icons.visibility_outlined),
       FlGroup(children:[
         FlToggleRow(title:'显示控制组件',icon:Icons.widgets_outlined,value:enabled,
@@ -197,12 +185,11 @@ class _FlControlsScreenState extends State<FlControlsScreen> {
       FlSliderPanel(title:'透明度',value:opacity,
         onChanged:(v)=>setState(()=>opacity=v)),
       const SizedBox(height:12),
-      FlSliderPanel(title:'灵敏度预览',value:sensitivity,
-        subtitle:'仅演示参数编辑控件，不修改设备行为',
+      FlSliderPanel(title:'灵敏度',value:sensitivity,
         onChanged:(v)=>setState(()=>sensitivity=v)),
       const FlSection(title:'数值与选择',icon:Icons.tune_outlined),
       FlGroup(children:[
-        FlSettingRow(title:'刷新率预览',subtitle:'本地展示数字，不控制屏幕帧率',
+        FlSettingRow(title:'刷新率',
           trailing:FlStepCounter(value:polling,min:30,max:240,step:10,
             onChanged:(v)=>setState(()=>polling=v))),
         FlSettingRow(title:'交互模式',subtitle:preset,
@@ -229,16 +216,16 @@ class _FlProfilesScreenState extends State<FlProfilesScreen>{
       {'id':'opacity','name':'透明度','type':'slider','default':84,'min':0,'max':100,'suffix':'%'},
       {'id':'color','name':'高亮颜色','type':'color'},
       {'id':'mode','name':'动画风格','type':'select','options':['柔和','标准','快速'],'default':'柔和'},
-      {'id':'label','name':'配置说明','type':'text','default':'视觉预览'},
+      {'id':'label','name':'文本','type':'text','default':'文本'},
     ]},
-    {'id':'bind','name':'参数编辑示例','type':'toggle','default':false,'debug':[
-      {'id':'key','name':'键码编辑（UI 模拟）','type':'key','default':62},
-      {'id':'binding','name':'区域与来源（UI 模拟）','type':'binding'},
+    {'id':'bind','name':'参数编辑','type':'toggle','default':false,'debug':[
+      {'id':'key','name':'键码','type':'key','default':62},
+      {'id':'binding','name':'区域与来源','type':'binding'},
       {'id':'list','name':'选项列表','type':'list','fields':[
         {'id':'name','name':'名称','type':'text','default':'新条目'},
         {'id':'action','name':'状态','type':'select','options':['开启','关闭'],'default':'开启'}]},
     ]},
-    {'id':'action','name':'演示按钮','type':'button','buttonText':'仅触发 UI 提示'},
+    {'id':'action','name':'按钮','type':'button','buttonText':'点击'},
   ];
   @override
   Widget build(BuildContext context){
@@ -251,12 +238,10 @@ class _FlProfilesScreenState extends State<FlProfilesScreen>{
       const FlSection(title:'外观方案',icon:Icons.folder_outlined),
       if(filtered.isNotEmpty) FlChoiceGroup<String>(value:chosen,choices:[
         for(final name in filtered) FlChoice(name,name,
-          preview:const Icon(Icons.layers_outlined),subtitle:'仅变更本地 UI 选中状态'),
+          preview:const Icon(Icons.layers_outlined)),
       ],onChanged:(v)=>setState(()=>chosen=v))
       else FlPanel(child:Text('没有匹配的方案',style:TextStyle(color:flMuted(context)))),
-      const FlSection(title:'插件 UI 协议预览',icon:Icons.account_tree_outlined),
-      const Text('使用全新的 FlClash 分组控件渲染声明式配置；无插件执行权限。',
-        style:TextStyle(fontSize:13)),
+      const FlSection(title:'参数控件',icon:Icons.account_tree_outlined),
       FlSchemaPanel(features:schema),
     ]);
   }

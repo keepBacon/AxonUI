@@ -47,7 +47,7 @@ class _FlClashAxonAppState extends State<FlClashAxonApp>{
   }
   @override
   Widget build(BuildContext context)=>MaterialApp(
-    title:'Axon UI · FlClash',debugShowCheckedModeBanner:false,
+    title:'控件展示',debugShowCheckedModeBanner:false,
     theme:flTheme(brightness:Brightness.light,seed:_seed,glass:_glass),
     darkTheme:flTheme(brightness:Brightness.dark,seed:_seed,glass:_glass),
     themeMode:_mode,
@@ -107,7 +107,7 @@ class _FlNavigationShellState extends State<FlNavigationShell>{
           selectedIndex:_selected,
           destinations:const [
             NavigationDockDestination(glyph:Icons.grid_view_rounded,label:'组件库'),
-            NavigationDockDestination(glyph:Icons.tune_rounded,label:'Axon控件'),
+            NavigationDockDestination(glyph:Icons.tune_rounded,label:'控件'),
             NavigationDockDestination(glyph:Icons.folder_outlined,label:'配置'),
             NavigationDockDestination(glyph:Icons.palette_outlined,label:'主题'),
           ],

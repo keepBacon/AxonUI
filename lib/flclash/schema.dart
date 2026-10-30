@@ -19,11 +19,10 @@ class _FlSchemaPanelState extends State<FlSchemaPanel> {
       FlSection(title: '${feature['name']??'未命名'}', icon: Icons.widgets_outlined),
       FlGroup(children: [
         if(feature['type']=='button')
-          FlSettingRow(title: feature['buttonText']?.toString() ?? '运行预览',
-            subtitle:'仅展示点击反馈，不执行插件动作',
+          FlSettingRow(title: feature['buttonText']?.toString() ?? '按钮',
             trailing:const Icon(Icons.chevron_right_rounded),
             onTap:(){ ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content:Text('UI 预览：没有执行任何输入动作'))); })
+              const SnackBar(content:Text('已点击'))); })
         else FlToggleRow(title:'在界面中显示',
           value:(_values['${feature['id']}.enabled']??feature['default']??false)==true,
           onChanged:(v)=>setState(()=>_values['${feature['id']}.enabled']=v)),
@@ -69,7 +68,6 @@ class _FlSchemaPanelState extends State<FlSchemaPanel> {
       case 'key':
         final key=value is num?value.toInt():-1;
         return FlGroup(children:[FlSettingRow(title:title,
-          subtitle:'仅预览键码，不捕获或发送实际按键',
           trailing:FlStepCounter(value:key,min:-1,max:999,onChanged:change))]);
       case 'binding':
         final map=value is Map?Map<String,dynamic>.from(value):<String,dynamic>{};
@@ -77,10 +75,8 @@ class _FlSchemaPanelState extends State<FlSchemaPanel> {
         return FlPanel(child:Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
           Text(title,style:const TextStyle(fontWeight:FontWeight.w600,fontSize:17)),
           const SizedBox(height:10),FlSegmented<String>(values:const ['touch','key'],
-            label:(v)=>v=='touch'?'触控预览':'按键预览',value:source=='key'?'key':'touch',
+            label:(v)=>v=='touch'?'触控':'按键',value:source=='key'?'key':'touch',
             onChanged:(v)=>change({...map,'source':v})),
-          const SizedBox(height:10),Text('仅用于布局显示；未接入任何输入接口',
-            style:TextStyle(color:flMuted(context))),
         ]));
       case 'color':
         final samples=[FlTokens.blue,const Color(0xFF5F9BCB),

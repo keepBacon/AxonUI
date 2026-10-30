@@ -18,7 +18,7 @@ python3 - <<'PY_ANDROID'
 from pathlib import Path
 m = Path('android/app/src/main/AndroidManifest.xml')
 s = m.read_text(encoding='utf-8')
-s = s.replace('android:label="axon_flclash_flutter"', 'android:label="Axon UI Studio"')
+s = s.replace('android:label="axon_flclash_flutter"', 'android:label="控件展示"')
 m.write_text(s,encoding='utf-8')
 PY_ANDROID
 

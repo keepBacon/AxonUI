@@ -7,7 +7,9 @@ void main(){
     await tester.pumpWidget(FlClashAxonApp(store:FlMemoryStore()));
     await tester.pumpAndSettle();
     expect(find.text('组件库'),findsWidgets);
-    expect(find.text('Axon 控件工作台'),findsOneWidget);
+    expect(find.text('控件目录'),findsOneWidget);
+    expect(find.textContaining('Axon'), findsNothing);
+    expect(find.textContaining('FlClash'), findsNothing);
     expect(find.byType(FlGroup),findsWidgets);
     expect(find.byType(NavigationDock),findsOneWidget);
     expect(find.text('仪表盘'),findsNothing);
@@ -18,13 +20,13 @@ void main(){
     expect(find.byType(FlChoiceGroup<ThemeMode>),findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('theme-back')));
     await tester.pumpAndSettle();
-    expect(find.text('Axon 控件工作台'),findsOneWidget);
+    expect(find.text('控件目录'),findsOneWidget);
     expect(tester.takeException(),isNull);
   });
   testWidgets('Axon preview controls use FlClash grouping and local state',(tester)async{
     await tester.pumpWidget(FlClashAxonApp(store:FlMemoryStore()));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Axon控件').last);
+    await tester.tap(find.text('控件').last);
     await tester.pumpAndSettle();
     expect(find.text('基础组件'),findsOneWidget);
     expect(find.byType(FlToggleRow),findsWidgets);
@@ -32,7 +34,7 @@ void main(){
     await tester.ensureVisible(demo);
     await tester.tap(demo);
     await tester.pumpAndSettle();
-    expect(find.text('已触发视觉反馈'),findsOneWidget);
+    expect(find.text('已点击'),findsOneWidget);
     expect(tester.takeException(),isNull);
   });
   testWidgets('Live miniature preview fits short panels and animates tabs',(tester)async{

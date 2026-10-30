@@ -23,13 +23,13 @@ class _FlAxonCatalogueScreenState extends State<FlAxonCatalogueScreen> {
     final categories = <(String, String, IconData, VoidCallback)>[
       ('基础控件', '按钮 · 开关 · 分段 · 数值 · 滑块',
         Icons.widgets_outlined, widget.onControls),
-      ('键鼠与手柄', '虚拟键帽 · 鼠标 · 手柄反馈',
+      ('键鼠与手柄', '键帽 · 鼠标按键 · 手柄按钮',
         Icons.sports_esports_outlined, widget.onControls),
-      ('触控布局', '拖动与位置调整 · 仅视觉预览',
+      ('触控布局', '拖动 · 位置 · 尺寸',
         Icons.touch_app_outlined, widget.onControls),
-      ('插件 Schema', 'toggle · select · binding · list 等',
+      ('参数编辑', '开关 · 选择 · 键位 · 列表',
         Icons.account_tree_outlined, widget.onSchema),
-      ('材质与动效', 'FlClash 液态玻璃 · 颜色 · 页面动画',
+      ('材质与动效', '液态玻璃 · 配色 · 页面动画',
         Icons.water_drop_outlined, widget.onTheme),
     ].where((item) => (item.$1 + item.$2).toLowerCase()
         .contains(query.toLowerCase().trim())).toList();
@@ -40,31 +40,7 @@ class _FlAxonCatalogueScreenState extends State<FlAxonCatalogueScreen> {
       children: [
         const Text('组件库', style: TextStyle(
           fontSize: 29, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 7),
-        Text('Axon Input · Flutter UI 预览',
-          style: TextStyle(color: flMuted(context), fontSize: 14)),
-        const SizedBox(height: 17),
-        FlPanel(child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(children: [
-              Icon(Icons.auto_awesome_motion_rounded,
-                color: Theme.of(context).colorScheme.primary, size: 23),
-              const SizedBox(width: 10),
-              const Expanded(child: Text('Axon 控件工作台',
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20))),
-            ]),
-            const SizedBox(height: 9),
-            const Text('保留 FlClash UI 材质、布局质感和动画组件；'
-              '将展示内容换为 Axon 控件，不接入实际输入功能。'),
-            const SizedBox(height: 12),
-            Wrap(spacing: 7, runSpacing: 8, children: [
-              _AxonToken('UI ONLY'),
-              _AxonToken('FLUTTER'),
-              _AxonToken('AXON CONTROLS'),
-            ]),
-          ],
-        )),
+        const SizedBox(height: 6),
         const FlSection(title: '控件目录', icon: Icons.grid_view_rounded),
         TextField(
           key: const ValueKey('axon-category-search'),
@@ -89,46 +65,22 @@ class _FlAxonCatalogueScreenState extends State<FlAxonCatalogueScreen> {
                 onTap: item.$4,
               ),
           ]),
-        const FlSection(title: '交互预览', icon: Icons.tune_rounded),
+        const FlSection(title: '基础控件', icon: Icons.tune_rounded),
         FlGroup(children: [
           FlToggleRow(
-            title: '组件启用状态',
-            subtitle: '只更新本地 UI',
+            title: '开关',
             icon: Icons.toggle_on_outlined,
             value: previewEnabled,
             onChanged: (value) => setState(() => previewEnabled = value),
           ),
           FlSettingRow(
-            title: '查看 Axon 控件',
-            subtitle: '进入完整的可交互预览',
+            title: '更多控件',
             leading: const Icon(Icons.touch_app_outlined),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: widget.onControls,
           ),
         ]),
       ],
-    );
-  }
-}
-
-class _AxonToken extends StatelessWidget {
-  const _AxonToken(this.label);
-  final String label;
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: scheme.primary.withValues(alpha: .09),
-        borderRadius: BorderRadius.circular(11),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-        child: Text(label, style: TextStyle(
-          fontSize: 10, fontWeight: FontWeight.w700,
-          color: scheme.primary,
-        )),
-      ),
     );
   }
 }
@@ -148,7 +100,7 @@ class _FlAxonControlsScreenState extends State<FlAxonControlsScreen> {
   Color selectedColor = FlTokens.blue;
   Offset position = const Offset(.46, .50);
   bool pressed = false;
-  final fieldController = TextEditingController(text: '预览控件');
+  final fieldController = TextEditingController(text: '文本');
 
   @override
   void dispose() {
@@ -163,11 +115,8 @@ class _FlAxonControlsScreenState extends State<FlAxonControlsScreen> {
       key: const PageStorageKey('axon-controls'),
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 138),
       children: [
-        const Text('Axon 控件', style: TextStyle(
+        const Text('控件', style: TextStyle(
           fontSize: 29, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 7),
-        Text('组件外观采用 FlClash UI，交互仅更改演示状态。',
-          style: TextStyle(color: flMuted(context))),
         const FlSection(title: '基础组件', icon: Icons.widgets_outlined),
         FlGroup(children: [
           FlToggleRow(
@@ -189,13 +138,12 @@ class _FlAxonControlsScreenState extends State<FlAxonControlsScreen> {
               onChanged: (v) => setState(() => count = v)),
           ),
           FlSettingRow(
-            title: '交互反馈按钮',
-            subtitle: pressed ? '已触发视觉反馈' : '点击查看按钮状态',
+            title: '按钮',
             leading: const Icon(Icons.touch_app_outlined),
             trailing: FilledButton.tonal(
               key: const ValueKey('axon-demo-button'),
               onPressed: () => setState(() => pressed = !pressed),
-              child: Text(pressed ? '已点击' : '预览'),
+              child: Text(pressed ? '已点击' : '点击'),
             ),
           ),
         ]),
@@ -223,11 +171,8 @@ class _FlAxonControlsScreenState extends State<FlAxonControlsScreen> {
         FlPanel(child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('虚拟键帽与按钮', style: TextStyle(
+            const Text('键帽', style: TextStyle(
               fontWeight: FontWeight.w600, fontSize: 17)),
-            const SizedBox(height: 8),
-            Text('点击仅改变预览状态，不捕获或发送按键。',
-              style: TextStyle(color: flMuted(context), fontSize: 12)),
             const SizedBox(height: 16),
             Wrap(spacing: 9, runSpacing: 9, children: [
               for (final key in const [
@@ -246,11 +191,8 @@ class _FlAxonControlsScreenState extends State<FlAxonControlsScreen> {
         FlPanel(child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('按键位置预览', style: TextStyle(
+            const Text('按键位置', style: TextStyle(
               fontWeight: FontWeight.w600, fontSize: 17)),
-            const SizedBox(height: 7),
-            Text('拖动 SPACE 按钮，仅更新本页面位置。',
-              style: TextStyle(color: flMuted(context), fontSize: 12)),
             const SizedBox(height: 14),
             AspectRatio(
               aspectRatio: 1.65,
@@ -319,11 +261,10 @@ class _FlAxonControlsScreenState extends State<FlAxonControlsScreen> {
         FlPanel(child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Axon 插件声明控件', style: TextStyle(
+            const Text('参数控件', style: TextStyle(
               fontWeight: FontWeight.w600, fontSize: 17)),
             const SizedBox(height: 11),
-            const Text('toggle、button、slider、number、select、text、'
-              'key、color、binding、list 的演示由「配置」页提供。'),
+            const Text('开关 · 按钮 · 滑块 · 数值 · 选择 · 文本 · 键位 · 颜色 · 绑定 · 列表'),
           ],
         )),
       ],

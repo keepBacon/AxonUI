@@ -105,7 +105,7 @@ class _FlLivePreviewState extends State<FlLivePreview> {
                     child: Center(child: Row(mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.auto_awesome_rounded, size:18, color:widget.accent),
-                        const SizedBox(width:6), Text('Axon UI', style:TextStyle(fontSize:11,color:fg)),
+                        const SizedBox(width:6), Text('控件', style:TextStyle(fontSize:11,color:fg)),
                       ]))),
                   const SizedBox(height: 6),
                   for (var i=0;i<3;i++) Padding(padding: const EdgeInsets.only(bottom:6),
