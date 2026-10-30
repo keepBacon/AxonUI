@@ -255,6 +255,51 @@ void main(){
     expect(indicator.duration, Duration.zero);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('Fade-through supports rapid page retargeting',(tester) async {
+    var tab = 0;
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body:
+      StatefulBuilder(builder: (context, set) => Column(children: [
+        FilledButton(onPressed: () => set(() => tab = (tab + 1) % 3),
+          child: const Text('next')),
+        Expanded(child: FlFadeThrough(
+          child: Center(key: ValueKey(tab),
+            child: Text(['第一页', '第二页', '第三页'][tab])),
+        )),
+      ])),
+    )));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('next'));
+    await tester.pump(const Duration(milliseconds: 90));
+    await tester.tap(find.text('next'));
+    await tester.pumpAndSettle();
+    expect(find.text('第三页'), findsOneWidget);
+    expect(find.text('第一页'), findsNothing);
+    expect(find.text('第二页'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Slider touch enlarges and releases value badge',(tester) async {
+    var value = 40.0;
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body:
+      StatefulBuilder(builder: (context, set) => FlSliderPanel(
+        title: '速度', value: value,
+        onChanged: (v) => set(() => value = v),
+      )),
+    )));
+    await tester.pumpAndSettle();
+    final badge = find.byKey(const ValueKey('slider-value-速度'));
+    final slider = find.byType(Slider);
+    final finger = await tester.startGesture(tester.getCenter(slider));
+    await tester.pump();
+    expect(tester.widget<AnimatedScale>(badge).scale, greaterThan(1));
+    await finger.moveBy(const Offset(55, 0));
+    await tester.pump();
+    await finger.up();
+    await tester.pumpAndSettle();
+    expect(tester.widget<AnimatedScale>(badge).scale, 1);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Declarative schema is strictly UI only',(tester)async{
     await tester.pumpWidget(const MaterialApp(home:Scaffold(body:SingleChildScrollView(
       child:FlSchemaPanel(features:[{'id':'a','name':'界面','type':'toggle',

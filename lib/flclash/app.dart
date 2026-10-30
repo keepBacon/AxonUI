@@ -5,6 +5,7 @@ import 'axon_gallery.dart';
 import 'store.dart';
 import 'theme.dart';
 import 'glass.dart';
+import 'motion.dart';
 import 'original_navigation_dock.dart';
 import 'upstream_liquid_glass.dart';
 
@@ -55,10 +56,7 @@ class _FlClashAxonAppState extends State<FlClashAxonApp>{
       quality:_glass==1?LiquidGlassQuality.standard:LiquidGlassQuality.ultra,
       child:LiquidGlassHost(enabled:_glass>0,
       child:FlGlassScope(level:_glass,
-      child:FlAmbientBackdrop(level:_glass,child:AnimatedSwitcher(
-      duration:const Duration(milliseconds:260),
-      switchInCurve:const Interval(.5,1,curve:Curves.easeOutCubic),
-      switchOutCurve:const Interval(.5,1,curve:Curves.easeInCubic),
+      child:FlAmbientBackdrop(level:_glass,child:FlFadeThrough(
       child:_themeOpen
         ? FlThemeScreen(key:const ValueKey('theme'),
           onBack:()=>setState(()=>_themeOpen=false),mode:_mode,seed:_seed,
@@ -90,15 +88,7 @@ class _FlNavigationShellState extends State<FlNavigationShell>{
       const FlProfilesScreen(),
     ];
     return Scaffold(body:SafeArea(child:Stack(children:[
-      Positioned.fill(child:AnimatedSwitcher(
-        duration:FlMotion.effective(context,FlMotion.page),
-        switchInCurve:const Interval(.5,1,curve:Curves.easeOutCubic),
-        switchOutCurve:const Interval(.5,1,curve:Curves.easeInCubic),
-        transitionBuilder:(child,animation)=>FadeTransition(
-          opacity:animation,child:SlideTransition(
-            position:Tween(begin:const Offset(.035,0),end:Offset.zero)
-              .animate(animation),
-            child:child)),
+      Positioned.fill(child:FlFadeThrough(
         child:KeyedSubtree(key:ValueKey('page-$_selected'),child:pages[_selected]),
       )),
       // Directly uses the FlClash navigation_dock.dart spring/lens engine.

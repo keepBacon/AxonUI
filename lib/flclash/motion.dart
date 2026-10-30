@@ -57,3 +57,42 @@ class _FlPressScaleState extends State<FlPressScale> {
     ),
   );
 }
+
+class FlFadeThrough extends StatelessWidget {
+  const FlFadeThrough({super.key, required this.child});
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => AnimatedSwitcher(
+    duration: FlMotion.effective(context, FlMotion.page),
+    layoutBuilder: (current, previous) => Stack(
+      fit: StackFit.expand,
+      children: [...previous, if (current != null) current],
+    ),
+    transitionBuilder: (page, animation) => AnimatedBuilder(
+      animation: animation,
+      child: page,
+      builder: (context, page) {
+        final leaving = animation.status == AnimationStatus.reverse;
+        final t = animation.value.clamp(0.0, 1.0).toDouble();
+        final raw = leaving
+            ? ((t - .55) / .45).clamp(0.0, 1.0).toDouble()
+            : ((t - .40) / .60).clamp(0.0, 1.0).toDouble();
+        final opacity = Curves.easeOutCubic.transform(raw);
+        return IgnorePointer(
+          ignoring: leaving,
+          child: ExcludeSemantics(
+            excluding: leaving,
+            child: Opacity(
+              opacity: opacity,
+              child: FractionalTranslation(
+                translation: Offset(leaving ? 0 : .018 * (1 - opacity), 0),
+                child: page,
+              ),
+            ),
+          ),
+        );
+      },
+    ),
+    child: child,
+  );
+}

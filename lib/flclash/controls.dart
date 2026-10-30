@@ -72,7 +72,14 @@ class FlSettingRow extends StatelessWidget {
     pressedScale: .988,
     child: InkWell(
     onTap: onTap,
-    child: ConstrainedBox(constraints: BoxConstraints(minHeight: height),
+    child: AnimatedContainer(
+      duration: FlMotion.effective(context, FlMotion.short),
+      curve: FlMotion.curve,
+      decoration: BoxDecoration(
+        color: selected
+          ? Theme.of(context).colorScheme.primary.withValues(alpha: .055)
+          : Colors.transparent),
+      child: ConstrainedBox(constraints: BoxConstraints(minHeight: height),
       child: Padding(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Row(children: [
           if (leading != null) ...[
@@ -97,6 +104,7 @@ class FlSettingRow extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primary, size: 29)
               : (trailing ?? const SizedBox.shrink(key: ValueKey('empty')))),
         ])),
+      ),
     ),
   ));
 }
@@ -268,7 +276,8 @@ class FlColorSwatches extends StatelessWidget {
   );
 }
 
-class FlSliderPanel extends StatelessWidget {
+/// Slider value changes without animation lag; only its badge reacts to touch.
+class FlSliderPanel extends StatefulWidget {
   const FlSliderPanel({super.key, required this.title, required this.value,
     required this.onChanged, this.min = 0, this.max = 100,
     this.suffix = '%', this.subtitle, this.divisions});
@@ -278,22 +287,62 @@ class FlSliderPanel extends StatelessWidget {
   final int? divisions;
   final ValueChanged<double> onChanged;
   @override
+  State<FlSliderPanel> createState() => _FlSliderPanelState();
+}
+
+class _FlSliderPanelState extends State<FlSliderPanel> {
+  int? _pointer;
+  bool _active = false;
+
+  void _begin(PointerDownEvent event) {
+    if (_pointer != null) return;
+    _pointer = event.pointer;
+    setState(() => _active = true);
+  }
+
+  void _end(int pointer) {
+    if (_pointer != pointer) return;
+    _pointer = null;
+    if (_active) setState(() => _active = false);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final v = value.clamp(min, max).toDouble();
+    final v = widget.value.clamp(widget.min, widget.max).toDouble();
+    final colors = Theme.of(context).colorScheme;
     return FlPanel(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
-        Expanded(child: Text(title, style: const TextStyle(fontSize: 17))),
-        DecoratedBox(decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(20)),
-          child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            child: Text('${v.round()}${suffix ?? ''}', style: const TextStyle(
-              fontSize: 15, fontWeight: FontWeight.w600)))),
+        Expanded(child: Text(widget.title, style: const TextStyle(fontSize: 17))),
+        AnimatedScale(
+          key: ValueKey('slider-value-${widget.title}'),
+          scale: _active ? 1.085 : 1,
+          duration: FlMotion.effective(context,
+            _active ? FlMotion.press : FlMotion.release),
+          curve: _active ? FlMotion.curve : FlMotion.rebound,
+          child: AnimatedContainer(
+            duration: FlMotion.effective(context, FlMotion.short),
+            curve: FlMotion.curve,
+            decoration: BoxDecoration(
+              color: _active ? colors.primaryContainer : colors.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: Text('${v.round()}${widget.suffix ?? ''}',
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+          ),
+        ),
       ]),
-      if (subtitle != null) Padding(padding: const EdgeInsets.only(top: 8),
-        child: Text(subtitle!, style: TextStyle(color: flMuted(context)))),
+      if (widget.subtitle != null) Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: Text(widget.subtitle!, style: TextStyle(color: flMuted(context)))),
       const SizedBox(height: 12),
-      Slider(value: v, min: min, max: max, divisions: divisions, onChanged: onChanged),
+      Listener(
+        onPointerDown: _begin,
+        onPointerUp: (event) => _end(event.pointer),
+        onPointerCancel: (event) => _end(event.pointer),
+        child: Slider(value: v, min: widget.min, max: widget.max,
+          divisions: widget.divisions, onChanged: widget.onChanged),
+      ),
     ]));
   }
 }
@@ -427,6 +476,22 @@ class FlReorderPanel extends StatelessWidget {
         shrinkWrap: true,
         buildDefaultDragHandles: false,
         itemCount: items.length,
+        proxyDecorator: (child, index, animation) => AnimatedBuilder(
+          animation: animation,
+          child: child,
+          builder: (context, child) {
+            final t = Curves.easeOutCubic.transform(animation.value);
+            return Transform.scale(
+              scale: 1 + .025 * t,
+              child: Material(
+                color: flSurface(context),
+                borderRadius: BorderRadius.circular(18),
+                elevation: 7 * t,
+                child: child,
+              ),
+            );
+          },
+        ),
         onReorderItem: onReorder,
         itemBuilder: (context, index) => ListTile(
           key: ValueKey(items[index]),
