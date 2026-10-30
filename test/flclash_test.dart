@@ -119,11 +119,24 @@ void main(){
     await tester.tap(find.byKey(const ValueKey('dashboard-power')));
     await tester.pumpAndSettle();
     expect(find.text('演示状态已开启'), findsOneWidget);
-    await tester.ensureVisible(find.byKey(const ValueKey('dashboard-expand')));
+    // The dashboard is a lazily built ListView. Its final settings card
+    // does not exist in the element tree until the viewport scrolls there.
+    final expand = find.byKey(const ValueKey('dashboard-expand'));
+    await tester.scrollUntilVisible(
+      expand,
+      180,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(expand);
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('dashboard-expand')));
+    expect(expand, findsOneWidget);
+    await tester.tap(expand);
     await tester.pumpAndSettle();
     expect(find.textContaining('没有网络代理'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await tester.tap(expand);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('没有网络代理'), findsNothing);
     expect(tester.takeException(), isNull);
   });
   testWidgets('Segmented choice updates locally',(tester)async{
