@@ -6,6 +6,8 @@ import 'advanced_controls.dart';
 import 'color_debug.dart';
 import 'animation_debug.dart';
 import 'material_debug.dart';
+import 'effect_debug.dart';
+import 'sequence_debug.dart';
 
 /// Axon component catalogue using FlClash's existing Material components.
 /// No networking, key capture, mouse injection or input actions are present.
@@ -36,6 +38,10 @@ class _FlAxonCatalogueScreenState extends State<FlAxonCatalogueScreen> {
         Icons.gradient_outlined, widget.onControls),
       ('材质调试', '圆角 · 阴影 · 模糊 · 边框',
         Icons.blur_on_outlined, widget.onControls),
+      ('按压反馈调试', '缩放 · 波纹 · 透明度',Icons.touch_app_outlined,widget.onControls),
+      ('图层颜色调试', '背景 · 按下 · 边框 · 文字',Icons.layers_outlined,widget.onControls),
+      ('多色序列调试', '多色渐变 · 色标调整',Icons.gradient_outlined,widget.onControls),
+      ('文字效果调试', '描边 · 阴影 · 偏移',Icons.format_color_text_outlined,widget.onControls),
       ('排版与间距', '字号 · 字重 · 行高 · 内边距',
         Icons.text_fields_outlined, widget.onControls),
       ('参数编辑', '开关 · 选择 · 键位 · 列表',
@@ -282,6 +288,14 @@ class _FlAxonControlsScreenState extends State<FlAxonControlsScreen> {
         const FlTypographyDebug(),
         const SizedBox(height:12),
         const FlSpacingDebug(),
+        const FlSection(title:'高级调试',icon:Icons.tune_outlined),
+        const FlPressDebug(),
+        const SizedBox(height:12),
+        const FlLayerColorDebug(),
+        const SizedBox(height:12),
+        const FlColorSequenceDebug(),
+        const SizedBox(height:12),
+        const FlTextEffectsDebug(),
         const FlAdditionalControls(),
         const FlSection(title: '参数控件', icon: Icons.account_tree_outlined),
         FlPanel(child: Column(

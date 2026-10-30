@@ -345,6 +345,20 @@ void main(){
     await tester.pumpAndSettle();
     expect(tester.takeException(),isNull);
   });
+  testWidgets('Color sequence and press controls render independently',(tester) async {
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(body:
+      SingleChildScrollView(child: Column(children: [
+        FlColorSequenceDebug(), FlPressDebug(),
+      ])),
+    )));
+    await tester.pumpAndSettle();
+    final add = find.byKey(const ValueKey('color-stop-add'));
+    await tester.tap(add);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('color-stop-3')), findsOneWidget);
+    expect(find.byKey(const ValueKey('press-debug-target')), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('Declarative schema is strictly UI only',(tester)async{
     await tester.pumpWidget(const MaterialApp(home:Scaffold(body:SingleChildScrollView(
       child:FlSchemaPanel(features:[{'id':'a','name':'界面','type':'toggle',

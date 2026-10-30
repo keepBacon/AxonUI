@@ -9,6 +9,8 @@ export 'flclash/advanced_controls.dart';
 export 'flclash/color_debug.dart';
 export 'flclash/animation_debug.dart';
 export 'flclash/material_debug.dart';
+export 'flclash/effect_debug.dart';
+export 'flclash/sequence_debug.dart';
 export 'flclash/dock.dart';
 export 'flclash/original_navigation_dock.dart';
 export 'flclash/preview.dart';
