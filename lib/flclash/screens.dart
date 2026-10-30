@@ -4,7 +4,6 @@ import 'preview.dart';
 import 'schema.dart';
 import 'store.dart';
 import 'theme.dart';
-import 'glass.dart';
 
 class FlThemeScreen extends StatefulWidget {
   const FlThemeScreen({super.key, required this.onBack, required this.mode,
