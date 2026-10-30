@@ -1,4 +1,4 @@
-name: Build Axon UI Lab Preview APK
+name: Build AxonUI FlClash Style Component Preview
 on:
   push:
     branches: [main]
@@ -7,7 +7,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: axon-ui-lab-${{ github.ref }}
+  group: axon-flclash-preview-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   build:
@@ -41,12 +41,12 @@ jobs:
           flutter build apk --release --target-platform android-arm64
           test -s build/app/outputs/flutter-apk/app-release.apk
           mkdir -p dist
-          cp build/app/outputs/flutter-apk/app-release.apk dist/Axon-UI-Lab-Preview-arm64.apk
-          (cd dist && sha256sum Axon-UI-Lab-Preview-arm64.apk > SHA256SUMS.txt)
+          cp build/app/outputs/flutter-apk/app-release.apk dist/AxonUI-FlClash-Preview-arm64.apk
+          (cd dist && sha256sum AxonUI-FlClash-Preview-arm64.apk > SHA256SUMS.txt)
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Axon-UI-Lab-Preview-arm64-${{ github.run_number }}
+          name: AxonUI-FlClash-Preview-arm64-${{ github.run_number }}
           path: dist/
           if-no-files-found: error
           retention-days: 14

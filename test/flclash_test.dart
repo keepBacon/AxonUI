@@ -3,44 +3,37 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:axon_flclash_flutter/flclash_ui.dart';
 
 void main(){
-  testWidgets('FlClash theme is the default screen with real selection groups',(tester)async{
+  testWidgets('The Axon catalogue retains FlClash navigation and material',(tester)async{
     await tester.pumpWidget(FlClashAxonApp(store:FlMemoryStore()));
     await tester.pumpAndSettle();
-    expect(find.text('主题'),findsWidgets);
+    expect(find.text('组件库'),findsWidgets);
+    expect(find.text('Axon 控件工作台'),findsOneWidget);
+    expect(find.byType(FlGroup),findsWidgets);
+    expect(find.byType(NavigationDock),findsOneWidget);
+    expect(find.text('仪表盘'),findsNothing);
+    // The original FlClash theme screen must remain reachable.
+    await tester.tap(find.text('主题').last);
+    await tester.pumpAndSettle();
     expect(find.text('外观模式'),findsOneWidget);
-    expect(find.text('浅色'),findsOneWidget);
-    // The first choice group is initially mounted in the visible viewport.
-    expect(find.byType(FlChoiceGroup<ThemeMode>), findsOneWidget);
-    // Lower sections are created lazily by ListView; scroll before checking.
-    await tester.scrollUntilVisible(
-      find.text('固定'), 240,
-      scrollable: find.byType(Scrollable).first,
-    );
-    // scrollUntilVisible can stop when a lazily built child is still in
-    // viewport cache extent. Bring it completely on-screen before tapping.
-    await tester.ensureVisible(find.text('固定'));
-    await tester.pumpAndSettle();
-    expect(find.byType(FlChoiceGroup<bool>), findsWidgets);
-    await tester.tap(find.text('固定'));
-    await tester.pumpAndSettle();
-    final row = tester.widget<FlSettingRow>(
-      find.ancestor(
-        of: find.text('固定'), matching: find.byType(FlSettingRow),
-      ).first,
-    );
-    expect(row.selected, isTrue);
-  });
-  testWidgets('Navigation exposes freshly rebuilt FlClash controls',(tester)async{
-    await tester.pumpWidget(FlClashAxonApp(store:FlMemoryStore()));
-    await tester.pumpAndSettle();
+    expect(find.byType(FlChoiceGroup<ThemeMode>),findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('theme-back')));
     await tester.pumpAndSettle();
-    expect(find.text('概览'),findsWidgets);
-    expect(find.byType(NavigationDock), findsOneWidget);
-    await tester.tap(find.text('控件').first);
+    expect(find.text('Axon 控件工作台'),findsOneWidget);
+    expect(tester.takeException(),isNull);
+  });
+  testWidgets('Axon preview controls use FlClash grouping and local state',(tester)async{
+    await tester.pumpWidget(FlClashAxonApp(store:FlMemoryStore()));
     await tester.pumpAndSettle();
-    expect(find.text('控件'), findsWidgets);
+    await tester.tap(find.text('Axon控件').last);
+    await tester.pumpAndSettle();
+    expect(find.text('基础组件'),findsOneWidget);
     expect(find.byType(FlToggleRow),findsWidgets);
+    final demo=find.byKey(const ValueKey('axon-demo-button'));
+    await tester.ensureVisible(demo);
+    await tester.tap(demo);
+    await tester.pumpAndSettle();
+    expect(find.text('已触发视觉反馈'),findsOneWidget);
+    expect(tester.takeException(),isNull);
   });
   testWidgets('Live miniature preview fits short panels and animates tabs',(tester)async{
     await tester.pumpWidget(const MaterialApp(

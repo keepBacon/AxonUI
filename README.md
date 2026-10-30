@@ -1,46 +1,28 @@
-# AxonUI · FlClash-style Flutter UI (v5)
+# AxonUI — FlClash-styled UI component preview
 
-A **complete UI-layer rewrite**, using FlClash's grouping, generous rounded surfaces, preview-choice lists, motion patterns and a floating navigation bar as design references. This is an independent Dart/Flutter component system for Axon Input interface prototypes; it is **not** FlClash's network client.
+This repository builds an **Axon Input UI library preview APK**. It **retains the FlClash Flutter UI appearance**, the original navigation dock, the official optical Liquid Glass shader and capture engine, rounded panels, grouped settings, selectors and animations. It is not a VPN client and does not execute keyboard, mouse, gamepad or touch operations.
 
-## Architecture
+## Preview structure
 
-- `lib/flclash/theme.dart` — design tokens, Material 3 themes, motion timings.
-- `lib/flclash/glass.dart` — integrates FlClash original `LiquidGlassScope`, `LiquidGlassHost`, capture and shader rendering.
-- `lib/flclash/controls.dart` — grouped settings, preview choices, switches, segmented controls, color swatches, sliders, bottom sheets, local reorder.
-- `lib/flclash/preview.dart` — self-drawn miniature UI preview and interactive phone motion demo.
-- `lib/flclash/schema.dart` — Axon-style declarative UI schema rendered with the *new* FlClash components; no feature execution.
-- `lib/flclash/screens.dart` — rebuilt theme, overview, controls and profile interfaces.
-- `lib/flclash/app.dart` — sequential page transitions avoiding simultaneous outgoing/incoming text.
-- `lib/flclash/dock.dart` — travelling selection lens, continuous touch following, shader lens on lift and material preview.
-- `lib/flclash/store.dart` — optional display-preference storage only.
+- **组件库** — searchable Axon component catalogue, all groups styled with FlClash `FlPanel`, `FlGroup`, `FlSettingRow`.
+- **Axon控件** — toggles, buttons, segmented controls, sliders, value steppers, keycaps, gamepad visual preview, local-only draggable touch-button layout, text input and color palettes.
+- **配置** — declarative Axon plugin schema renderer with local-only state.
+- **主题** — FlClash theme and Liquid Glass settings, using `LiquidGlassHost`, original capture layer and shader.
 
-**All legacy Axon widget implementations and earlier v1–v4 galleries were removed from the active source tree.** No input injection, interception, overlay engine, native gamepad logic or key execution is included.
+App entry: `lib/main.dart` → `FlClashAxonApp`.
+
+New gallery: `lib/flclash/axon_gallery.dart`.
+
+Existing rendering components are retained under `lib/flclash/`, notably
+`original_navigation_dock.dart`, `upstream_liquid_glass.dart`,
+`upstream_liquid_glass_capture.dart` and `shaders/liquid_glass.frag`.
+
+This change specifically rolls back the earlier *standalone Axon UI Lab application shell* and preserves the intended FlClash visual system. Axon-specific content uses that system's components rather than a separately styled application. Prior UI-only demonstration builds remain in Git history.
 
 ## Build
 
-GitHub Actions → **Build AxonUI FlClash v5 APK** → workflow push/dispatch; artifact contains `AxonUI-FlClash-v5-arm64.apk` and SHA256SUMS. Or run:
+The GitHub Actions workflow runs Flutter static analysis, Widget tests and a release ARM64 APK build, then uploads the APK as an Artifact.
 
-```bash
-flutter create --platforms=android --org com.axon --project-name axon_flclash_flutter --no-pub .
-bash scripts/prepare_android.sh
-flutter pub get
-flutter analyze --no-fatal-infos
-flutter test
-flutter build apk --release --target-platform android-arm64
-```
+## License
 
-`Flutter 3.47.7` and `Java 17` are pinned in CI.
-
-## Three-phase reconstruction (2026-10-30)
-
-1. **Reference audit** — compared user recordings against the FlClash navigation dock and display hierarchy. Shader/capture from upstream remains unchanged.
-2. **UI rebuild** — dashboard becomes a multi-card display (local state only), the theme preview moves below primary controls, and the travelling lens dock is retained. No real connection/keyboard/gamepad behavior.
-3. **Validation** — GitHub Actions runs analyzer, widget tests and an ARM64 release APK, uploading Artifacts only on success. Changes to page layout and local interactions have regression tests.
-
-## Glass renderer accuracy
-
-The switch uses the original FlClash optical glass engine for floating navigation. Standard and ultra select official render quality. A contrast glass preview makes optical effects inspectable. Regular settings cards stay opaque. Shader effects require device/Impeller support.
-
-## Licensing
-
-UI design references: FlClash by chen08209 (`https://github.com/chen08209/FlClash`), GPL-3.0. This repository retains its GPL-3.0 license and original source attribution. Widgets were separately implemented for this UI-only prototype; no proxy/network functionality is bundled.
+GPL-3.0; upstream FlClash components are attributed in their respective source files. No FlClash networking engine is included.

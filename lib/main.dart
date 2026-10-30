@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'axon_preview/app.dart';
+import 'flclash/app.dart';
 
-/// Axon UI Lab is a component-preview APK, not the Axon Input runtime.
-void main() => runApp(const AxonPreviewApp());
+/// UI library preview using the FlClash-derived material/navigation system.
+void main() => runApp(const FlClashAxonApp());

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'screens.dart';
-import 'dashboard.dart';
+import 'axon_gallery.dart';
 import 'store.dart';
 import 'theme.dart';
 import 'glass.dart';
@@ -21,7 +21,7 @@ class _FlClashAxonAppState extends State<FlClashAxonApp>{
   ThemeMode _mode=ThemeMode.system;
   Color _seed=FlTokens.blue;
   int _glass=2;
-  bool _themeOpen=true;
+  bool _themeOpen=false;
   @override
   void initState(){super.initState();_load();}
   Future<void> _load()async{
@@ -81,8 +81,12 @@ class _FlNavigationShellState extends State<FlNavigationShell>{
   @override
   Widget build(BuildContext context){
     final pages=<Widget>[
-      FlOverviewScreen(openTheme:widget.openTheme),
-      const FlControlsScreen(),
+      FlAxonCatalogueScreen(
+        onControls:()=>setState(()=>_selected=1),
+        onSchema:()=>setState(()=>_selected=2),
+        onTheme:widget.openTheme,
+      ),
+      const FlAxonControlsScreen(),
       const FlProfilesScreen(),
     ];
     return Scaffold(body:SafeArea(child:Stack(children:[
@@ -102,8 +106,8 @@ class _FlNavigationShellState extends State<FlNavigationShell>{
         child:NavigationDock(
           selectedIndex:_selected,
           destinations:const [
-            NavigationDockDestination(glyph:Icons.dashboard_rounded,label:'概览'),
-            NavigationDockDestination(glyph:Icons.tune_rounded,label:'控件'),
+            NavigationDockDestination(glyph:Icons.grid_view_rounded,label:'组件库'),
+            NavigationDockDestination(glyph:Icons.tune_rounded,label:'Axon控件'),
             NavigationDockDestination(glyph:Icons.folder_outlined,label:'配置'),
             NavigationDockDestination(glyph:Icons.palette_outlined,label:'主题'),
           ],
