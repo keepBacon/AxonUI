@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'controls.dart';
 import 'theme.dart';
 import 'motion.dart';
+import 'advanced_controls.dart';
 
 /// Axon component catalogue using FlClash's existing Material components.
 /// No networking, key capture, mouse injection or input actions are present.
@@ -28,6 +29,10 @@ class _FlAxonCatalogueScreenState extends State<FlAxonCatalogueScreen> {
         Icons.sports_esports_outlined, widget.onControls),
       ('触控布局', '拖动 · 位置 · 尺寸',
         Icons.touch_app_outlined, widget.onControls),
+      ('摇杆与方向', '双摇杆 · 十字键 · 触控板',
+        Icons.gamepad_outlined, widget.onControls),
+      ('外观参数', '边框 · 圆角 · 渐变 · 进度',
+        Icons.style_outlined, widget.onControls),
       ('参数编辑', '开关 · 选择 · 键位 · 列表',
         Icons.account_tree_outlined, widget.onSchema),
       ('材质与动效', '液态玻璃 · 配色 · 页面动画',
@@ -260,7 +265,8 @@ class _FlAxonControlsScreenState extends State<FlAxonControlsScreen> {
             ),
           ],
         )),
-        const FlSection(title: 'Schema 覆盖', icon: Icons.account_tree_outlined),
+        const FlAdditionalControls(),
+        const FlSection(title: '参数控件', icon: Icons.account_tree_outlined),
         FlPanel(child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
