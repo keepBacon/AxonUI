@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'screens.dart';
+import 'dashboard.dart';
 import 'store.dart';
 import 'theme.dart';
 import 'glass.dart';

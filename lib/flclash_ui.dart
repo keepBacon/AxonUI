@@ -10,3 +10,4 @@ export 'flclash/schema.dart';
 export 'flclash/store.dart';
 export 'flclash/app.dart';
 export 'flclash/screens.dart';
+export 'flclash/dashboard.dart';
