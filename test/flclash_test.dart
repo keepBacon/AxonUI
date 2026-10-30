@@ -119,6 +119,8 @@ void main(){
     await tester.tap(find.byKey(const ValueKey('dashboard-power')));
     await tester.pumpAndSettle();
     expect(find.text('演示状态已开启'), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const ValueKey('dashboard-expand')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('dashboard-expand')));
     await tester.pumpAndSettle();
     expect(find.textContaining('没有网络代理'), findsOneWidget);
