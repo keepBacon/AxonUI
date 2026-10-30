@@ -43,8 +43,10 @@ class FlGlassSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     final tier = (level ?? FlGlassScope.of(context)).clamp(0, 2);
     final corners = BorderRadius.circular(radius);
-    if (tier == 0) return Material(color: flSurface(context),
-      borderRadius: corners, clipBehavior: Clip.antiAlias, child: child);
+    if (tier == 0) {
+      return Material(color: flSurface(context),
+        borderRadius: corners, clipBehavior: Clip.antiAlias, child: child);
+    }
     final scheme = Theme.of(context).colorScheme;
     return LiquidGlass(
       style: pill ? LiquidGlassStyle.pill(scheme) : LiquidGlassStyle.regular(scheme),

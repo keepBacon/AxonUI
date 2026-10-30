@@ -58,23 +58,34 @@ void main(){
     expect(find.text('配置'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
-  testWidgets('Glass modes select FlClash LiquidGlass render objects',(tester) async {
-    await tester.pumpWidget(const MaterialApp(
-      home: Scaffold(body: FlGlassScope(level: 0,
-        child: FlPanel(child: Text('Glass test')))),
-    ));
+  testWidgets('Glass modes select real FlClash shader-backed surfaces',(tester) async {
+    Widget demo(int level) => MaterialApp(
+      home: Scaffold(body: LiquidGlassScope(
+        enabled: level > 0,
+        quality: level == 1 ? LiquidGlassQuality.standard : LiquidGlassQuality.ultra,
+        child: LiquidGlassHost(
+          enabled: level > 0,
+          child: FlGlassScope(
+            level: level,
+            child: const Center(
+              child: FlGlassSurface(
+                pill: true,
+                child: SizedBox(width: 250, height: 58, child: Text('Glass test')),
+              ),
+            ),
+          ),
+        ),
+      )),
+    );
+    await tester.pumpWidget(demo(0));
     await tester.pumpAndSettle();
     expect(find.byType(LiquidGlass), findsNothing);
-    await tester.pumpWidget(const MaterialApp(
-      home: Scaffold(body: FlGlassScope(level: 2,
-        child: FlPanel(child: Text('Glass test')))),
-    ));
+    await tester.pumpWidget(demo(1));
     await tester.pumpAndSettle();
-    expect(find.byType(LiquidGlass), findsWidgets);
-    final surface = tester.widget<FlGlassSurface>(
-      find.byType(FlGlassSurface).first,
-    );
-    expect(surface.level, isNull); // level is inherited from scope
+    expect(find.byType(LiquidGlass), findsOneWidget);
+    await tester.pumpWidget(demo(2));
+    await tester.pumpAndSettle();
+    expect(find.byType(LiquidGlass), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
   testWidgets('Segmented choice updates locally',(tester)async{

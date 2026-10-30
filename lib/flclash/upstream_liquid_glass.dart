@@ -7,7 +7,6 @@ import 'package:material_color_utilities/material_color_utilities.dart' show Hct
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:material_ui/material_ui.dart';
 
 part 'upstream_liquid_glass_capture.dart';
 
