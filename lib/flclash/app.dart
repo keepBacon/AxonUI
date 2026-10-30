@@ -4,6 +4,7 @@ import 'screens.dart';
 import 'store.dart';
 import 'theme.dart';
 import 'glass.dart';
+import 'upstream_liquid_glass.dart';
 
 class FlClashAxonApp extends StatefulWidget {
   const FlClashAxonApp({super.key,this.store});
@@ -48,7 +49,11 @@ class _FlClashAxonAppState extends State<FlClashAxonApp>{
     theme:flTheme(brightness:Brightness.light,seed:_seed,glass:_glass),
     darkTheme:flTheme(brightness:Brightness.dark,seed:_seed,glass:_glass),
     themeMode:_mode,
-    home:FlGlassScope(level:_glass,child:FlAmbientBackdrop(level:_glass,child:AnimatedSwitcher(
+    home:LiquidGlassScope(enabled:_glass>0,
+      quality:_glass==1?LiquidGlassQuality.standard:LiquidGlassQuality.ultra,
+      child:LiquidGlassHost(enabled:_glass>0,
+      child:FlGlassScope(level:_glass,
+      child:FlAmbientBackdrop(level:_glass,child:AnimatedSwitcher(
       duration:const Duration(milliseconds:260),
       switchInCurve:Curves.easeOutCubic,
       child:_themeOpen
@@ -57,7 +62,7 @@ class _FlClashAxonAppState extends State<FlClashAxonApp>{
           onMode:_setMode,onSeed:_setSeed,glass:_glass,onGlass:_setGlass,store:_store)
         : FlNavigationShell(key:const ValueKey('shell'),
           openTheme:()=>setState(()=>_themeOpen=true)),
-    ))),
+    ))))),
   );
 }
 
@@ -90,7 +95,7 @@ class _FlNavigationShellState extends State<FlNavigationShell>{
         child:KeyedSubtree(key:ValueKey('page-$_selected'),child:pages[_selected]),
       )),
       Positioned(left:18,right:18,bottom:14,
-        child:FlGlassSurface(radius:_floating?30:18,shadow:true,
+        child:FlGlassSurface(radius:_floating?30:18,shadow:true,pill:true,
           child:Padding(padding:const EdgeInsets.all(7),
               child:Row(children:[
                 for(var i=0;i<4;i++) Expanded(child:InkWell(

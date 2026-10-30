@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'theme.dart';
-import 'glass.dart';
 
 /// Section caption outside of the raised group, matching FlClash settings.
 class FlSection extends StatelessWidget {
@@ -28,8 +27,10 @@ class FlGroup extends StatelessWidget {
   final List<Widget> children;
   final double radius;
   @override
-  Widget build(BuildContext context) => FlGlassSurface(
-    radius: radius,
+  Widget build(BuildContext context) => Material(
+    color: flSurface(context),
+    borderRadius: BorderRadius.circular(radius),
+    clipBehavior: Clip.antiAlias,
     child: Column(mainAxisSize: MainAxisSize.min, children: [
       for (var i = 0; i < children.length; i++) ...[
         if (i != 0) Padding(
@@ -47,8 +48,10 @@ class FlPanel extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
   @override
-  Widget build(BuildContext context) => FlGlassSurface(
-    radius: FlTokens.radius,
+  Widget build(BuildContext context) => Material(
+    color: flSurface(context),
+    borderRadius: BorderRadius.circular(FlTokens.radius),
+    clipBehavior: Clip.antiAlias,
     child: Padding(padding: padding, child: child),
   );
 }
@@ -151,7 +154,7 @@ class FlSegmented<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return FlGlassSurface(radius: 32,
+    return Material(color: flSurface(context), borderRadius: BorderRadius.circular(32),
       child: Padding(padding: const EdgeInsets.all(5), child: Row(children: [
         for (final v in values) Expanded(child: InkWell(
           key: ValueKey('segment-$v'),
@@ -307,7 +310,7 @@ class _DiscreteTrackPainter extends CustomPainter {
 Future<T?> flShowSheet<T>(BuildContext context, {required String title,
   required Widget child}) => showModalBottomSheet<T>(
     context: context, isScrollControlled: true, useSafeArea: true,
-    backgroundColor: FlGlassScope.of(context) == 0 ? flSurface(context) : Colors.transparent,
+    backgroundColor: flSurface(context),
     showDragHandle: true,
     builder: (ctx) => Padding(padding: EdgeInsets.fromLTRB(24, 10, 24,
       MediaQuery.viewInsetsOf(ctx).bottom + 24),

@@ -58,19 +58,19 @@ void main(){
     expect(find.text('配置'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
-  testWidgets('Glass modes control real BackdropFilter surfaces',(tester) async {
+  testWidgets('Glass modes select FlClash LiquidGlass render objects',(tester) async {
     await tester.pumpWidget(const MaterialApp(
       home: Scaffold(body: FlGlassScope(level: 0,
         child: FlPanel(child: Text('Glass test')))),
     ));
     await tester.pumpAndSettle();
-    expect(find.byType(BackdropFilter), findsNothing);
+    expect(find.byType(LiquidGlass), findsNothing);
     await tester.pumpWidget(const MaterialApp(
       home: Scaffold(body: FlGlassScope(level: 2,
         child: FlPanel(child: Text('Glass test')))),
     ));
     await tester.pumpAndSettle();
-    expect(find.byType(BackdropFilter), findsWidgets);
+    expect(find.byType(LiquidGlass), findsWidgets);
     final surface = tester.widget<FlGlassSurface>(
       find.byType(FlGlassSurface).first,
     );

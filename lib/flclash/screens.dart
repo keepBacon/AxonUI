@@ -116,7 +116,7 @@ class _FlThemeScreenState extends State<FlThemeScreen>{
           FlChoice(2,'极致',preview:FlScreenThumb(accent:widget.seed,glass:2)),
         ],onChanged:widget.onGlass),
         Padding(padding:const EdgeInsets.only(top:8),child:Text(
-          '实时毛玻璃材质：标准与极致使用不同的背景模糊及玻璃边缘高光。',
+          '光学液态玻璃：官方 Shader 与背景捕获系统应用于悬浮导航。',
           style:TextStyle(fontSize:12,color:flMuted(context)))),
         const FlSection(title:'字体',icon:Icons.font_download_outlined),
         FlGroup(children:[FlSettingRow(title:_font,leading:const Text('Aa',
