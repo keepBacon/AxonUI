@@ -2,10 +2,8 @@
 // of the user's FlClash-main.zip (dashboard/layout.dart, style.dart, widgets/card.dart).
 // No proxy engine, network telemetry or input behavior is implemented.
 import 'package:flutter/material.dart';
-import 'theme.dart';
 
 const _demoBlue = Color(0xFF0787FA);
-const _demoInk = Color(0xFF20212A);
 
 class FlOverviewScreen extends StatefulWidget {
   const FlOverviewScreen({super.key, required this.openTheme});
@@ -333,7 +331,7 @@ class _FlConnectedButton extends StatelessWidget {
                 Text(label, style: TextStyle(
                   fontSize: 11, fontWeight: FontWeight.w600,
                   color: selected ? Colors.white : c.onSurface)),
-              ]))),
+              ])))),
     );
   }
 }
