@@ -115,28 +115,44 @@ void main(){
     )));
     await tester.pumpAndSettle();
     expect(find.text('仪表盘'), findsOneWidget);
-    expect(find.text('模式展示'), findsOneWidget);
+    expect(find.text('状态'), findsOneWidget);
+    expect(find.byKey(const ValueKey('dashboard-power')), findsOneWidget);
+
+    // Status is local widget state only; no network or input engine is used.
     await tester.tap(find.byKey(const ValueKey('dashboard-power')));
     await tester.pumpAndSettle();
-    expect(find.text('演示状态已开启'), findsOneWidget);
-    // The dashboard is a lazily built ListView. Its final settings card
-    // does not exist in the element tree until the viewport scrolls there.
-    final expand = find.byKey(const ValueKey('dashboard-expand'));
+    expect(find.text('预览正在运行'), findsOneWidget);
+    expect(find.textContaining('不执行设备操作'), findsOneWidget);
+
+    // Mode selector replaces the previous '模式展示' widget.
+    final mode = find.byKey(const ValueKey('dashboard-mode-1'));
     await tester.scrollUntilVisible(
-      expand,
-      180,
-      scrollable: find.byType(Scrollable).first,
+      mode, 150, scrollable: find.byType(Scrollable).first,
     );
-    await tester.ensureVisible(expand);
+    await tester.ensureVisible(mode);
     await tester.pumpAndSettle();
-    expect(expand, findsOneWidget);
-    await tester.tap(expand);
+    await tester.tap(mode);
     await tester.pumpAndSettle();
-    expect(find.textContaining('没有网络代理'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-    await tester.tap(expand);
+    final selectedMode = tester.widget<AnimatedContainer>(mode);
+    final decoration = selectedMode.decoration! as BoxDecoration;
+    expect(decoration.color, const Color(0xFF0787FA));
+
+    // New dashboard-edit control opens the expanded UI-only layout description.
+    final edit = find.byKey(const ValueKey('dashboard-edit'));
+    await tester.scrollUntilVisible(
+      edit, -180, scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(edit);
     await tester.pumpAndSettle();
-    expect(find.textContaining('没有网络代理'), findsNothing);
+    await tester.tap(edit);
+    await tester.pumpAndSettle();
+    final expanded = find.textContaining('布局编辑预览');
+    await tester.scrollUntilVisible(
+      expanded, 170, scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(expanded);
+    await tester.pumpAndSettle();
+    expect(expanded, findsOneWidget);
     expect(tester.takeException(), isNull);
   });
   testWidgets('Segmented choice updates locally',(tester)async{
