@@ -133,9 +133,28 @@ void main(){
     await tester.pumpAndSettle();
     await tester.tap(mode);
     await tester.pumpAndSettle();
-    final selectedMode = tester.widget<AnimatedContainer>(mode);
+    // The ValueKey belongs to the private _FlConnectedButton wrapper.
+    // Inspect its public AnimatedContainer descendant rather than casting
+    // the wrapper itself to AnimatedContainer.
+    final modeSurface = find.descendant(
+      of: mode,
+      matching: find.byType(AnimatedContainer),
+    );
+    expect(modeSurface, findsOneWidget);
+    final selectedMode = tester.widget<AnimatedContainer>(modeSurface);
     final decoration = selectedMode.decoration! as BoxDecoration;
     expect(decoration.color, const Color(0xFF0787FA));
+
+    // The previously selected rule button must lose the selected tint.
+    final rule = find.byKey(const ValueKey('dashboard-mode-0'));
+    final ruleSurface = find.descendant(
+      of: rule,
+      matching: find.byType(AnimatedContainer),
+    );
+    expect(ruleSurface, findsOneWidget);
+    final ruleDecoration =
+        tester.widget<AnimatedContainer>(ruleSurface).decoration! as BoxDecoration;
+    expect(ruleDecoration.color, isNot(const Color(0xFF0787FA)));
 
     // New dashboard-edit control opens the expanded UI-only layout description.
     final edit = find.byKey(const ValueKey('dashboard-edit'));
