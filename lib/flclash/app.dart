@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'screens.dart';
-import 'axon_gallery.dart';
+import 'feature_pages.dart';
 import 'store.dart';
 import 'theme.dart';
 import 'glass.dart';
@@ -79,13 +79,10 @@ class _FlNavigationShellState extends State<FlNavigationShell>{
   @override
   Widget build(BuildContext context){
     final pages=<Widget>[
-      FlAxonCatalogueScreen(
-        onControls:()=>setState(()=>_selected=1),
-        onSchema:()=>setState(()=>_selected=2),
-        onTheme:widget.openTheme,
-      ),
-      const FlAxonControlsScreen(),
-      const FlProfilesScreen(),
+      FlPreviewHomeScreen(onSelect:(i)=>setState(()=>_selected=i)),
+      const FlKeyDisplayScreen(),
+      const FlPluginShowcaseScreen(),
+      FlOtherShowcaseScreen(openTheme:widget.openTheme),
     ];
     return Scaffold(body:SafeArea(child:Stack(children:[
       Positioned.fill(child:FlFadeThrough(
@@ -96,13 +93,12 @@ class _FlNavigationShellState extends State<FlNavigationShell>{
         child:NavigationDock(
           selectedIndex:_selected,
           destinations:const [
-            NavigationDockDestination(glyph:Icons.grid_view_rounded,label:'组件库'),
-            NavigationDockDestination(glyph:Icons.tune_rounded,label:'控件'),
-            NavigationDockDestination(glyph:Icons.folder_outlined,label:'配置'),
-            NavigationDockDestination(glyph:Icons.palette_outlined,label:'主题'),
+            NavigationDockDestination(glyph:Icons.home_outlined,label:'主页'),
+            NavigationDockDestination(glyph:Icons.keyboard_outlined,label:'键显'),
+            NavigationDockDestination(glyph:Icons.extension_outlined,label:'插件'),
+            NavigationDockDestination(glyph:Icons.tune_outlined,label:'其他'),
           ],
           onSelected:(i){
-            if(i==3){widget.openTheme();return;}
             if(i!=_selected)setState(()=>_selected=i);
           },
         )),

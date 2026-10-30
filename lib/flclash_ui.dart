@@ -6,6 +6,8 @@ export 'flclash/upstream_liquid_glass.dart';
 export 'flclash/controls.dart';
 export 'flclash/motion.dart';
 export 'flclash/advanced_controls.dart';
+export 'flclash/feature_catalog.dart';
+export 'flclash/feature_pages.dart';
 export 'flclash/color_debug.dart';
 export 'flclash/animation_debug.dart';
 export 'flclash/material_debug.dart';

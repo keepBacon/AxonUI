@@ -3,38 +3,35 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:axon_flclash_flutter/flclash_ui.dart';
 
 void main(){
-  testWidgets('The Axon catalogue retains FlClash navigation and material',(tester)async{
+  testWidgets('Four navigation tabs are present',(tester)async{
     await tester.pumpWidget(FlClashAxonApp(store:FlMemoryStore()));
     await tester.pumpAndSettle();
-    expect(find.text('组件库'),findsWidgets);
-    expect(find.text('控件目录'),findsOneWidget);
-    expect(find.textContaining('Axon'), findsNothing);
-    expect(find.textContaining('FlClash'), findsNothing);
-    expect(find.byType(FlGroup),findsWidgets);
+    for(final label in const ['主页','键显','插件','其他']){
+      expect(find.text(label),findsWidgets);
+    }
     expect(find.byType(NavigationDock),findsOneWidget);
-    expect(find.text('仪表盘'),findsNothing);
-    // The original FlClash theme screen must remain reachable.
-    await tester.tap(find.text('主题').last);
-    await tester.pumpAndSettle();
-    expect(find.text('外观模式'),findsOneWidget);
-    expect(find.byType(FlChoiceGroup<ThemeMode>),findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('theme-back')));
-    await tester.pumpAndSettle();
-    expect(find.text('控件目录'),findsOneWidget);
     expect(tester.takeException(),isNull);
   });
-  testWidgets('Axon preview controls use FlClash grouping and local state',(tester)async{
+  testWidgets('Key display opens only three category entrances',(tester)async{
     await tester.pumpWidget(FlClashAxonApp(store:FlMemoryStore()));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('控件').last);
+    await tester.tap(find.text('键显').last);
     await tester.pumpAndSettle();
-    expect(find.text('基础组件'),findsOneWidget);
-    expect(find.byType(FlToggleRow),findsWidgets);
-    final demo=find.byKey(const ValueKey('axon-demo-button'));
-    await tester.ensureVisible(demo);
-    await tester.tap(demo);
+    expect(find.byKey(const ValueKey('entry-arrow-键鼠')),findsOneWidget);
+    expect(find.byKey(const ValueKey('entry-arrow-手柄')),findsOneWidget);
+    expect(find.byKey(const ValueKey('entry-arrow-自定义')),findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('entry-arrow-自定义')));
     await tester.pumpAndSettle();
-    expect(find.text('已点击'),findsOneWidget);
+    expect(find.text('颜色与材质'),findsOneWidget);
+    final row=find.byKey(const ValueKey('debug-arrow-颜色调试'));
+    await tester.ensureVisible(row);
+    await tester.tap(row);
+    await tester.pumpAndSettle();
+    expect(find.text('颜色调试'),findsWidgets);
+    expect(find.byKey(const ValueKey('color-debug-preview')),findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('debug-back')));
+    await tester.pumpAndSettle();
+    expect(find.text('颜色与材质'),findsOneWidget);
     expect(tester.takeException(),isNull);
   });
   testWidgets('Live miniature preview fits short panels and animates tabs',(tester)async{
