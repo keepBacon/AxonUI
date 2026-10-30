@@ -109,6 +109,21 @@ void main(){
     expect(chosen, 1);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('FlClash-style dashboard controls stay UI-only',(tester) async {
+    await tester.pumpWidget(MaterialApp(home: Scaffold(
+      body: FlOverviewScreen(openTheme: () {}),
+    )));
+    await tester.pumpAndSettle();
+    expect(find.text('仪表盘'), findsOneWidget);
+    expect(find.text('模式展示'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('dashboard-power')));
+    await tester.pumpAndSettle();
+    expect(find.text('演示状态已开启'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('dashboard-expand')));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('没有网络代理'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('Segmented choice updates locally',(tester)async{
     var chosen='滑动';
     await tester.pumpWidget(MaterialApp(home:Scaffold(body:StatefulBuilder(

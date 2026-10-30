@@ -31,6 +31,12 @@ flutter build apk --release --target-platform android-arm64
 
 `Flutter 3.47.7` and `Java 17` are pinned in CI.
 
+## Three-phase reconstruction (2026-10-30)
+
+1. **Reference audit** — compared user recordings against the FlClash navigation dock and display hierarchy. Shader/capture from upstream remains unchanged.
+2. **UI rebuild** — dashboard becomes a multi-card display (local state only), the theme preview moves below primary controls, and the travelling lens dock is retained. No real connection/keyboard/gamepad behavior.
+3. **Validation** — GitHub Actions runs analyzer, widget tests and an ARM64 release APK, uploading Artifacts only on success. Changes to page layout and local interactions have regression tests.
+
 ## Glass renderer accuracy
 
 The switch uses the original FlClash optical glass engine for floating navigation. Standard and ultra select official render quality. A contrast glass preview makes optical effects inspectable. Regular settings cards stay opaque. Shader effects require device/Impeller support.
