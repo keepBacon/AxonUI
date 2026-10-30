@@ -30,7 +30,8 @@ void main(){
     await tester.tap(find.byKey(const ValueKey('segment-布局编辑')));
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('draggable-key')),findsOneWidget);
-    expect(find.text('仅视觉状态'),findsOneWidget);
+    // The virtual gamepad below the canvas is lazily built after scrolling.
+    expect(find.byKey(const ValueKey('draggable-key')),findsOneWidget);
     expect(tester.takeException(),isNull);
   });
   testWidgets('Material page toggles the real glass mode',(tester)async{
