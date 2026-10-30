@@ -36,9 +36,10 @@ void main(){
     await tester.tap(find.byKey(const ValueKey('theme-back')));
     await tester.pumpAndSettle();
     expect(find.text('概览'),findsWidgets);
-    await tester.tap(find.byKey(const ValueKey('tab-1')));
+    expect(find.byType(NavigationDock), findsOneWidget);
+    await tester.tap(find.text('控件').first);
     await tester.pumpAndSettle();
-    expect(find.text('控件'),findsWidgets);
+    expect(find.text('控件'), findsWidgets);
     expect(find.byType(FlToggleRow),findsWidgets);
   });
   testWidgets('Live miniature preview fits short panels and animates tabs',(tester)async{
@@ -87,6 +88,29 @@ void main(){
     await tester.pumpAndSettle();
     expect(find.byType(LiquidGlass), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+  testWidgets('Direct upstream FlClash dock is mounted and responsive',(tester) async {
+    var selected=0;
+    await tester.pumpWidget(MaterialApp(home:Scaffold(
+      body:StatefulBuilder(builder:(context,set)=>Align(
+        alignment:Alignment.bottomCenter,
+        child:NavigationDock(
+          selectedIndex:selected,
+          destinations:const [
+            NavigationDockDestination(glyph:Icons.home_outlined,label:'首页'),
+            NavigationDockDestination(glyph:Icons.tune_outlined,label:'设置'),
+            NavigationDockDestination(glyph:Icons.palette_outlined,label:'主题'),
+          ],
+          onSelected:(index)=>set(()=>selected=index),
+        ),
+      )),
+    )));
+    await tester.pumpAndSettle();
+    expect(find.byType(NavigationDock),findsOneWidget);
+    await tester.tap(find.text('设置').first);
+    await tester.pumpAndSettle();
+    expect(selected,1);
+    expect(tester.takeException(),isNull);
   });
   testWidgets('Glass dock selection lens responds to taps',(tester) async {
     var chosen = 0;

@@ -5,7 +5,7 @@ import 'dashboard.dart';
 import 'store.dart';
 import 'theme.dart';
 import 'glass.dart';
-import 'dock.dart';
+import 'original_navigation_dock.dart';
 import 'upstream_liquid_glass.dart';
 
 class FlClashAxonApp extends StatefulWidget {
@@ -97,14 +97,15 @@ class _FlNavigationShellState extends State<FlNavigationShell>{
             child:child)),
         child:KeyedSubtree(key:ValueKey('page-$_selected'),child:pages[_selected]),
       )),
-      Positioned(left:18,right:18,bottom:14,
-        child:FlLiquidNavigationDock(
+      // Directly uses the FlClash navigation_dock.dart spring/lens engine.
+      Positioned(left:0,right:0,bottom:0,
+        child:NavigationDock(
           selectedIndex:_selected,
           destinations:const [
-            FlDockDestination(Icons.dashboard_rounded,'概览'),
-            FlDockDestination(Icons.tune_rounded,'控件'),
-            FlDockDestination(Icons.folder_outlined,'配置'),
-            FlDockDestination(Icons.palette_outlined,'主题'),
+            NavigationDockDestination(glyph:Icons.dashboard_rounded,label:'概览'),
+            NavigationDockDestination(glyph:Icons.tune_rounded,label:'控件'),
+            NavigationDockDestination(glyph:Icons.folder_outlined,label:'配置'),
+            NavigationDockDestination(glyph:Icons.palette_outlined,label:'主题'),
           ],
           onSelected:(i){
             if(i==3){widget.openTheme();return;}
