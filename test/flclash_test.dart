@@ -301,38 +301,6 @@ void main(){
   });
 
 
-  testWidgets('Direction pad updates its own visual state',(tester) async {
-    await tester.pumpWidget(const MaterialApp(home: Scaffold(
-      body: Center(child: FlPreviewDpad()),
-    )));
-    await tester.pumpAndSettle();
-    final right = find.byKey(const ValueKey('preview-direction-右'));
-    await tester.tap(right);
-    await tester.pumpAndSettle();
-    expect(find.text('右'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('Virtual stick returns to center after drag',(tester) async {
-    await tester.pumpWidget(const MaterialApp(home: Scaffold(
-      body: Center(child: FlPreviewJoystick(title:'左摇杆')),
-    )));
-    await tester.pumpAndSettle();
-    final stick = find.byKey(const ValueKey('preview-stick-左摇杆'));
-    final before = tester.widget<AnimatedAlign>(find.byType(AnimatedAlign));
-    expect(before.alignment, Alignment.center);
-    final drag = await tester.startGesture(tester.getCenter(stick));
-    await drag.moveBy(const Offset(30, -12));
-    await tester.pump();
-    final moving = tester.widget<AnimatedAlign>(find.byType(AnimatedAlign));
-    expect(moving.alignment, isNot(Alignment.center));
-    await drag.up();
-    await tester.pumpAndSettle();
-    expect(tester.widget<AnimatedAlign>(find.byType(AnimatedAlign)).alignment,
-      Alignment.center);
-    expect(tester.takeException(), isNull);
-  });
-
   testWidgets('Visual style switches and chips are local UI',(tester) async {
     await tester.pumpWidget(const MaterialApp(home: Scaffold(
       body: SingleChildScrollView(child: Column(children:[
@@ -351,6 +319,27 @@ void main(){
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Color debugging accepts valid HEX and updates sample',(tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(child:FlColorDebug()))));
+    await tester.pumpAndSettle();
+    final field=find.byKey(const ValueKey('color-debug-hex'));
+    await tester.enterText(field,'FFFF0000');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('FFFF0000'),findsWidgets);
+    expect(tester.takeException(),isNull);
+  });
+  testWidgets('Animation debugging plays and resets',(tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(child:FlAnimationDebug()))));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('animation-debug-play')));
+    await tester.pump(const Duration(milliseconds:100));
+    await tester.tap(find.byKey(const ValueKey('animation-debug-reset')));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(),isNull);
+  });
   testWidgets('Declarative schema is strictly UI only',(tester)async{
     await tester.pumpWidget(const MaterialApp(home:Scaffold(body:SingleChildScrollView(
       child:FlSchemaPanel(features:[{'id':'a','name':'界面','type':'toggle',

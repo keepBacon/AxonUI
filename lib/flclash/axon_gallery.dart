@@ -3,6 +3,9 @@ import 'controls.dart';
 import 'theme.dart';
 import 'motion.dart';
 import 'advanced_controls.dart';
+import 'color_debug.dart';
+import 'animation_debug.dart';
+import 'material_debug.dart';
 
 /// Axon component catalogue using FlClash's existing Material components.
 /// No networking, key capture, mouse injection or input actions are present.
@@ -25,14 +28,16 @@ class _FlAxonCatalogueScreenState extends State<FlAxonCatalogueScreen> {
     final categories = <(String, String, IconData, VoidCallback)>[
       ('基础控件', '按钮 · 开关 · 分段 · 数值 · 滑块',
         Icons.widgets_outlined, widget.onControls),
-      ('键鼠与手柄', '键帽 · 鼠标按键 · 手柄按钮',
-        Icons.sports_esports_outlined, widget.onControls),
-      ('触控布局', '拖动 · 位置 · 尺寸',
-        Icons.touch_app_outlined, widget.onControls),
-      ('摇杆与方向', '双摇杆 · 十字键 · 触控板',
-        Icons.gamepad_outlined, widget.onControls),
-      ('外观参数', '边框 · 圆角 · 渐变 · 进度',
-        Icons.style_outlined, widget.onControls),
+      ('颜色调试', 'HSV · HEX · 透明度 · 色板',
+        Icons.palette_outlined, widget.onControls),
+      ('动画调试', '时长 · 曲线 · 位移 · 缩放',
+        Icons.animation_outlined, widget.onControls),
+      ('渐变调试', '渐变色 · 起止颜色 · 角度',
+        Icons.gradient_outlined, widget.onControls),
+      ('材质调试', '圆角 · 阴影 · 模糊 · 边框',
+        Icons.blur_on_outlined, widget.onControls),
+      ('排版与间距', '字号 · 字重 · 行高 · 内边距',
+        Icons.text_fields_outlined, widget.onControls),
       ('参数编辑', '开关 · 选择 · 键位 · 列表',
         Icons.account_tree_outlined, widget.onSchema),
       ('材质与动效', '液态玻璃 · 配色 · 页面动画',
@@ -265,6 +270,18 @@ class _FlAxonControlsScreenState extends State<FlAxonControlsScreen> {
             ),
           ],
         )),
+        const FlSection(title:'视觉调试',icon:Icons.tune_rounded),
+        const FlColorDebug(),
+        const SizedBox(height:12),
+        const FlAnimationDebug(),
+        const SizedBox(height:12),
+        const FlGradientDebug(),
+        const SizedBox(height:12),
+        const FlMaterialDebug(),
+        const SizedBox(height:12),
+        const FlTypographyDebug(),
+        const SizedBox(height:12),
+        const FlSpacingDebug(),
         const FlAdditionalControls(),
         const FlSection(title: '参数控件', icon: Icons.account_tree_outlined),
         FlPanel(child: Column(
