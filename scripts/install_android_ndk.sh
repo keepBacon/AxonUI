@@ -21,7 +21,7 @@ fi
 
 ndk_healthy() {
   [[ -f "$NDK_DIR/source.properties" ]] &&
-    grep -Eq '^Pkg.Revision[[:space:]]*=[[:space:]]*28\\.2\\.13676358[[:space:]]*$' "$NDK_DIR/source.properties" &&
+    grep -Eq '^Pkg.Revision[[:space:]]*=[[:space:]]*28\.2\.13676358[[:space:]]*$' "$NDK_DIR/source.properties" &&
     [[ -x "$NDK_DIR/toolchains/llvm/prebuilt/linux-x86_64/bin/clang" ]]
 }
 
