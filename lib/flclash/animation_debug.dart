@@ -2,7 +2,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'controls.dart';
 import 'color_debug.dart';
-import 'theme.dart';
 
 /// Animation preview only. The ticker is active exclusively while "播放" runs.
 class FlAnimationDebug extends StatefulWidget {
@@ -66,8 +65,7 @@ class _FlAnimationDebugState extends State<FlAnimationDebug>
                     child:Opacity(
                       key:const ValueKey('animation-debug-opacity'),
                       opacity:opacity,
-                      child:child))))),
-              );
+                      child:child)))));
             },
             child:Container(width:122,height:62,alignment:Alignment.center,
               decoration:BoxDecoration(

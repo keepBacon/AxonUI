@@ -334,9 +334,14 @@ void main(){
     await tester.pumpWidget(const MaterialApp(home:Scaffold(
       body:SingleChildScrollView(child:FlAnimationDebug()))));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('animation-debug-play')));
+    final play = find.byKey(const ValueKey('animation-debug-play'));
+    final reset = find.byKey(const ValueKey('animation-debug-reset'));
+    await tester.ensureVisible(play);
+    await tester.pumpAndSettle();
+    await tester.tap(play);
     await tester.pump(const Duration(milliseconds:100));
-    await tester.tap(find.byKey(const ValueKey('animation-debug-reset')));
+    await tester.ensureVisible(reset);
+    await tester.tap(reset);
     await tester.pumpAndSettle();
     expect(tester.takeException(),isNull);
   });
