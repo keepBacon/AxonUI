@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'theme.dart';
+import 'motion.dart';
 
 /// Section caption outside of the raised group, matching FlClash settings.
 class FlSection extends StatelessWidget {
@@ -67,7 +68,9 @@ class FlSettingRow extends StatelessWidget {
   final bool selected;
   final double height;
   @override
-  Widget build(BuildContext context) => InkWell(
+  Widget build(BuildContext context) => FlPressScale(
+    pressedScale: .988,
+    child: InkWell(
     onTap: onTap,
     child: ConstrainedBox(constraints: BoxConstraints(minHeight: height),
       child: Padding(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -95,7 +98,7 @@ class FlSettingRow extends StatelessWidget {
               : (trailing ?? const SizedBox.shrink(key: ValueKey('empty')))),
         ])),
     ),
-  );
+  ));
 }
 
 class FlChoice<T> {
@@ -144,6 +147,8 @@ class FlToggleRow extends StatelessWidget {
 }
 
 /// Full-width rounded segmented control with spring-like sliding thumb.
+/// A single selection pill glides between tabs instead of cross-fading
+/// separate colored backgrounds. An interrupted selection retargets in place.
 class FlSegmented<T> extends StatelessWidget {
   const FlSegmented({super.key, required this.values, required this.label,
     required this.value, required this.onChanged});
@@ -151,32 +156,61 @@ class FlSegmented<T> extends StatelessWidget {
   final String Function(T) label;
   final T value;
   final ValueChanged<T> onChanged;
+
   @override
   Widget build(BuildContext context) {
+    if (values.isEmpty) return const SizedBox.shrink();
     final scheme = Theme.of(context).colorScheme;
-    return Material(color: flSurface(context), borderRadius: BorderRadius.circular(32),
-      child: Padding(padding: const EdgeInsets.all(5), child: Row(children: [
-        for (final v in values) Expanded(child: InkWell(
-          key: ValueKey('segment-$v'),
-          borderRadius: BorderRadius.circular(27),
-          onTap: () => onChanged(v),
-          child: AnimatedContainer(
-            duration: FlMotion.effective(context, const Duration(milliseconds: 270)),
-            curve: FlMotion.curve,
-            height: 45,
-            decoration: BoxDecoration(
-              color: v == value ? scheme.primary : Colors.transparent,
-              borderRadius: BorderRadius.circular(27)),
-            alignment: Alignment.center,
-            child: AnimatedDefaultTextStyle(
-              duration: FlMotion.effective(context, FlMotion.short),
-              style: TextStyle(color: v == value ? scheme.onPrimary : scheme.onSurface,
-                fontWeight: v == value ? FontWeight.w700 : FontWeight.w500,
-                fontSize: 16),
-              child: Text(label(v), maxLines: 1, overflow: TextOverflow.ellipsis)),
-          ),
-        )),
-      ])));
+    final index = math.max(0, values.indexOf(value));
+    return Material(
+      color: flSurface(context),
+      borderRadius: BorderRadius.circular(32),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.all(5),
+        child: SizedBox(height: 45,
+          child: LayoutBuilder(builder: (context, constraints) {
+            final cellWidth = constraints.maxWidth / values.length;
+            return Stack(children: [
+              AnimatedPositioned(
+                key: const ValueKey('segmented-thumb'),
+                duration: FlMotion.effective(context, FlMotion.selection),
+                curve: FlMotion.curve,
+                left: index * cellWidth, top: 0, bottom: 0, width: cellWidth,
+                child: DecoratedBox(decoration: BoxDecoration(
+                  color: scheme.primary,
+                  borderRadius: BorderRadius.circular(27),
+                )),
+              ),
+              Row(children: [
+                for (final v in values)
+                  Expanded(child: FlPressScale(
+                    pressedScale: .95,
+                    child: InkWell(
+                      key: ValueKey('segment-$v'),
+                      borderRadius: BorderRadius.circular(27),
+                      onTap: () => onChanged(v),
+                      child: SizedBox(height: 45,
+                        child: Center(child: AnimatedDefaultTextStyle(
+                          duration: FlMotion.effective(context, FlMotion.short),
+                          curve: FlMotion.curve,
+                          style: TextStyle(
+                            color: v == value ? scheme.onPrimary : scheme.onSurface,
+                            fontWeight: v == value ? FontWeight.w700 : FontWeight.w500,
+                            fontSize: 16,
+                          ),
+                          child: Text(label(v), maxLines: 1,
+                            overflow: TextOverflow.ellipsis),
+                        )),
+                      ),
+                    ),
+                  )),
+              ]),
+            ]);
+          }),
+        ),
+      ),
+    );
   }
 }
 
@@ -186,28 +220,52 @@ class FlColorSwatches extends StatelessWidget {
   final List<Color> colors;
   final Color value;
   final ValueChanged<Color> onChanged;
+
   @override
   Widget build(BuildContext context) => SizedBox(height: 66,
     child: ListView(scrollDirection: Axis.horizontal, children: [
       for (final color in colors) Padding(
         padding: const EdgeInsets.only(right: 12),
-        child: InkWell(
-          key: ValueKey('swatch-${color.toARGB32()}'),
-          borderRadius: BorderRadius.circular(30), onTap: () => onChanged(color),
-          child: AnimatedContainer(duration: FlMotion.effective(context),
-            width: 53, height: 53,
-            decoration: BoxDecoration(shape: BoxShape.circle,
-              border: Border.all(
-                color: color == value ? Theme.of(context).colorScheme.primary : Colors.transparent,
-                width: 3)),
-            padding: const EdgeInsets.all(5),
-            child: DecoratedBox(decoration: BoxDecoration(
-              color: color, shape: BoxShape.circle),
-              child: color == value ? const Icon(Icons.check_rounded, color: Colors.white) : null),
+        child: FlPressScale(
+          pressedScale: .92,
+          child: InkWell(
+            key: ValueKey('swatch-${color.toARGB32()}'),
+            borderRadius: BorderRadius.circular(30),
+            onTap: () => onChanged(color),
+            child: AnimatedContainer(
+              duration: FlMotion.effective(context, FlMotion.selection),
+              curve: FlMotion.curve,
+              width: 53, height: 53,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: color == value
+                    ? Theme.of(context).colorScheme.primary : Colors.transparent,
+                  width: 3,
+                ),
+              ),
+              padding: const EdgeInsets.all(5),
+              child: DecoratedBox(
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                child: AnimatedSwitcher(
+                  duration: FlMotion.effective(context, FlMotion.short),
+                  switchInCurve: Curves.easeOutBack,
+                  transitionBuilder: (child, animation) => ScaleTransition(
+                    scale: animation,
+                    child: FadeTransition(opacity: animation, child: child),
+                  ),
+                  child: color == value
+                    ? const Icon(Icons.check_rounded,
+                        key: ValueKey('swatch-check'), color: Colors.white)
+                    : const SizedBox.shrink(key: ValueKey('swatch-empty')),
+                ),
+              ),
+            ),
           ),
         ),
       ),
-    ]));
+    ]),
+  );
 }
 
 class FlSliderPanel extends StatelessWidget {
@@ -310,6 +368,10 @@ class _DiscreteTrackPainter extends CustomPainter {
 Future<T?> flShowSheet<T>(BuildContext context, {required String title,
   required Widget child}) => showModalBottomSheet<T>(
     context: context, isScrollControlled: true, useSafeArea: true,
+    sheetAnimationStyle: AnimationStyle(
+      duration: FlMotion.effective(context, FlMotion.sheet),
+      reverseDuration: FlMotion.effective(context, FlMotion.release),
+    ),
     backgroundColor: flSurface(context),
     showDragHandle: true,
     builder: (ctx) => Padding(padding: EdgeInsets.fromLTRB(24, 10, 24,
@@ -333,11 +395,23 @@ class FlStepCounter extends StatelessWidget {
   final ValueChanged<int> onChanged;
   @override
   Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
-    IconButton.filledTonal(onPressed: value <= min ? null : () => onChanged(math.max(min, value - step)),
-      icon: const Icon(Icons.remove_rounded)),
-    SizedBox(width: 45, child: Text('$value', textAlign: TextAlign.center)),
-    IconButton.filledTonal(onPressed: value >= max ? null : () => onChanged(math.min(max, value + step)),
-      icon: const Icon(Icons.add_rounded)),
+    FlPressScale(pressedScale: .91,
+      child: IconButton.filledTonal(
+        onPressed: value <= min ? null : () => onChanged(math.max(min, value - step)),
+        icon: const Icon(Icons.remove_rounded),
+      )),
+    SizedBox(width: 45, child: AnimatedSwitcher(
+      duration: FlMotion.effective(context, FlMotion.short),
+      switchInCurve: FlMotion.curve,
+      transitionBuilder: (child, animation) => FadeTransition(
+        opacity: animation, child: ScaleTransition(scale: animation, child: child)),
+      child: Text('$value', key: ValueKey(value), textAlign: TextAlign.center),
+    )),
+    FlPressScale(pressedScale: .91,
+      child: IconButton.filledTonal(
+        onPressed: value >= max ? null : () => onChanged(math.min(max, value + step)),
+        icon: const Icon(Icons.add_rounded),
+      )),
   ]);
 }
 

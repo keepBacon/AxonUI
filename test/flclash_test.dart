@@ -202,6 +202,59 @@ void main(){
     await tester.pumpAndSettle();
     expect(chosen,'淡入');
   });
+  testWidgets('Segmented selection thumb travels and can be retargeted',(tester) async {
+    var selected = '一';
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body:
+      StatefulBuilder(builder: (context, set) => FlSegmented<String>(
+        values: const ['一', '二', '三'],
+        label: (v) => v,
+        value: selected,
+        onChanged: (v) => set(() => selected = v),
+      )),
+    )));
+    await tester.pumpAndSettle();
+    final thumb = find.byKey(const ValueKey('segmented-thumb'));
+    expect(thumb, findsOneWidget);
+    final start = tester.getTopLeft(thumb).dx;
+    await tester.tap(find.text('三'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    final traveling = tester.getTopLeft(thumb).dx;
+    await tester.pumpAndSettle();
+    final destination = tester.getTopLeft(thumb).dx;
+    expect(traveling, greaterThan(start));
+    expect(traveling, lessThan(destination));
+    await tester.tap(find.text('二'));
+    await tester.pumpAndSettle();
+    expect(selected, '二');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Pressed controls recover and honor reduced motion',(tester) async {
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body:
+      FlPressScale(pressedScale: .9, child: InkWell(
+        onTap: () {}, child: const SizedBox(width: 120, height: 60),
+      )),
+    )));
+    final target = find.byType(InkWell);
+    final gesture = await tester.startGesture(tester.getCenter(target));
+    await tester.pump();
+    expect(tester.widget<AnimatedScale>(find.byType(AnimatedScale)).scale, .9);
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(tester.widget<AnimatedScale>(find.byType(AnimatedScale)).scale, 1);
+    await tester.pumpWidget(MaterialApp(home: MediaQuery(
+      data: const MediaQueryData(disableAnimations: true),
+      child: Scaffold(body: FlSegmented<String>(
+        values: const ['甲', '乙'], label: (v) => v, value: '甲',
+        onChanged: (_) {},
+      )),
+    )));
+    final indicator = tester.widget<AnimatedPositioned>(
+      find.byKey(const ValueKey('segmented-thumb')));
+    expect(indicator.duration, Duration.zero);
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('Declarative schema is strictly UI only',(tester)async{
     await tester.pumpWidget(const MaterialApp(home:Scaffold(body:SingleChildScrollView(
       child:FlSchemaPanel(features:[{'id':'a','name':'界面','type':'toggle',

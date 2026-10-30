@@ -12,10 +12,15 @@ abstract final class FlTokens {
 }
 
 abstract final class FlMotion {
+  static const press = Duration(milliseconds: 105);
+  static const release = Duration(milliseconds: 190);
   static const short = Duration(milliseconds: 170);
   static const regular = Duration(milliseconds: 285);
+  static const selection = Duration(milliseconds: 290);
+  static const sheet = Duration(milliseconds: 340);
   static const page = Duration(milliseconds: 330);
   static const curve = Curves.easeOutCubic;
+  static const rebound = Curves.easeOutBack;
   static Duration effective(BuildContext context, [Duration preferred = regular]) =>
       MediaQuery.disableAnimationsOf(context) ? Duration.zero : preferred;
 }

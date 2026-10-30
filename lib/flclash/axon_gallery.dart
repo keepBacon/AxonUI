@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'controls.dart';
 import 'theme.dart';
+import 'motion.dart';
 
 /// Axon component catalogue using FlClash's existing Material components.
 /// No networking, key capture, mouse injection or input actions are present.
@@ -140,10 +141,12 @@ class _FlAxonControlsScreenState extends State<FlAxonControlsScreen> {
           FlSettingRow(
             title: '按钮',
             leading: const Icon(Icons.touch_app_outlined),
-            trailing: FilledButton.tonal(
-              key: const ValueKey('axon-demo-button'),
-              onPressed: () => setState(() => pressed = !pressed),
-              child: Text(pressed ? '已点击' : '点击'),
+            trailing: FlPressScale(pressedScale: .92,
+              child: FilledButton.tonal(
+                key: const ValueKey('axon-demo-button'),
+                onPressed: () => setState(() => pressed = !pressed),
+                child: Text(pressed ? '已点击' : '点击'),
+              ),
             ),
           ),
         ]),
@@ -281,22 +284,35 @@ class _AxonKeyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Material(
-      color: selected ? scheme.primary : scheme.surfaceContainerHigh,
-      borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        key: ValueKey('axon-key-$label'),
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minWidth: 46, minHeight: 44),
-          child: Center(child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 9),
-            child: Text(label,
-              style: TextStyle(fontWeight: FontWeight.w700,
-                fontSize: 12,
-                color: selected ? scheme.onPrimary : scheme.onSurface)),
-          )),
+    return FlPressScale(
+      pressedScale: .91,
+      child: AnimatedContainer(
+        duration: FlMotion.effective(context, FlMotion.short),
+        curve: FlMotion.curve,
+        decoration: BoxDecoration(
+          color: selected ? scheme.primary : scheme.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            key: ValueKey('axon-key-$label'),
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(14),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 46, minHeight: 44),
+              child: Center(child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 9),
+                child: AnimatedDefaultTextStyle(
+                  duration: FlMotion.effective(context, FlMotion.short),
+                  style: TextStyle(fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                    color: selected ? scheme.onPrimary : scheme.onSurface),
+                  child: Text(label),
+                ),
+              )),
+            ),
+          ),
         ),
       ),
     );
