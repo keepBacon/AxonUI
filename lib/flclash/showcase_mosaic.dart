@@ -491,7 +491,7 @@ class FlCategoryMiniature extends StatelessWidget {
       ]);
     }
     return SizedBox(key:ValueKey('category-thumb-$kind'),
-      width:73,height:32,child:Center(child:child));
+      width:73,height:26,child:Center(child:child));
   }
 }
 
