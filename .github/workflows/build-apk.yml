@@ -15,6 +15,20 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+      - name: Package complete tracked source
+        run: |
+          set -euo pipefail
+          mkdir -p source-dist
+          git archive --format=zip --prefix=AxonUI/ HEAD -o source-dist/AxonUI-Full-Source.zip
+          (cd source-dist && sha256sum AxonUI-Full-Source.zip > SOURCE-SHA256SUMS.txt)
+          test -s source-dist/AxonUI-Full-Source.zip
+      - name: Upload complete source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: AxonUI-Full-Source-${{ github.run_number }}
+          path: source-dist/
+          if-no-files-found: error
+          retention-days: 90
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
