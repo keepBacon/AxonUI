@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'controls.dart';
 import 'theme.dart';
@@ -495,6 +496,85 @@ class _FlKeyboardCatDebugStudioState extends State<FlKeyboardCatDebugStudio> {
         fontWeight:FontWeight.w800,color:cs.primary)),
       Text(label,style:TextStyle(fontSize:10,color:cs.onSurfaceVariant)),
     ]);
+  }
+
+
+  Widget _diagnostics(){
+    final cs=Theme.of(context).colorScheme;
+    final snapshot={
+      'source':'Axon-Input bundled keyboard-cat sample',
+      'uiOnly':true,
+      'active':active,
+      'activeAction':activeToken,
+      'previewCount':previewCount,
+      'bindings':bindings,
+      'modes':actionModes,
+      'parameterOverrides':overrides,
+      'parameterLocks':{
+        for(final e in locks.entries)
+          if(e.value)e.key:overrides[e.key]??.5,
+      },
+      'expressionWeights':expressionWeights,
+      'physics':{
+        'globalStrength':globalPhysics,
+        'demoGroups':{
+          for(final name in physicsStrengths.keys)
+            name:{
+              'enabled':physicsEnabled[name],
+              'strength':physicsStrengths[name],
+              'shortcut':physicsHotkeys[name],
+              'shortcutEnabled':physicsHotkeyEnabled[name],
+            },
+        },
+      },
+    };
+    final formatted=const JsonEncoder.withIndent('  ').convert(snapshot);
+    return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
+      _heading('调试状态与快照','只读 · 内存数据'),
+      FlPanel(padding:const EdgeInsets.all(14),child:Column(
+        crossAxisAlignment:CrossAxisAlignment.start,children:[
+          Text('当前状态',style:TextStyle(
+            fontWeight:FontWeight.w700,color:cs.onSurface)),
+          const SizedBox(height:10),
+          Wrap(spacing:8,runSpacing:8,children:[
+            _stateTag('当前动作',activeToken),
+            _stateTag('功能绑定',bindings.length.toString()),
+            _stateTag('参数覆盖',overrides.length.toString()),
+            _stateTag('锁定参数',
+              locks.values.where((v)=>v).length.toString()),
+          ]),
+          const SizedBox(height:13),
+          const Text('内存状态 JSON（仅预览，不导出到文件）',
+            style:TextStyle(fontSize:12,fontWeight:FontWeight.w600)),
+          const SizedBox(height:7),
+          Container(
+            key:const ValueKey('cat-debug-json'),
+            constraints:const BoxConstraints(maxHeight:230),
+            width:double.infinity,
+            padding:const EdgeInsets.all(10),
+            decoration:BoxDecoration(
+              color:cs.surfaceContainerHigh,
+              borderRadius:BorderRadius.circular(12)),
+            child:SingleChildScrollView(child:SelectableText(
+              formatted,style:TextStyle(fontFamily:'monospace',
+                fontSize:11,color:cs.onSurface))),
+          ),
+        ],
+      )),
+      const SizedBox(height:9),
+      Text('本面板不是运行时遥测；不会保存、读取或上传真实配置。',
+        style:TextStyle(color:cs.onSurfaceVariant,fontSize:11)),
+    ]);
+  }
+  Widget _stateTag(String label,String value){
+    final cs=Theme.of(context).colorScheme;
+    return Container(
+      padding:const EdgeInsets.symmetric(horizontal:10,vertical:8),
+      decoration:BoxDecoration(color:cs.surfaceContainerHigh,
+        borderRadius:BorderRadius.circular(10)),
+      child:Text(label+'：'+value,
+        style:TextStyle(color:cs.onSurface,fontSize:11)),
+    );
   }
 
   Widget _heading(String title,String subtitle){
