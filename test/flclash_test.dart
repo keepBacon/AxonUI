@@ -3,6 +3,29 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:axon_flclash_flutter/flclash_ui.dart';
 
 void main(){
+  testWidgets('Keyboard cat full sample categories and filter controls',
+    (tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(
+        child:FlKeyboardCatDebugStudio(initialSection:1)))));
+    await tester.pumpAndSettle();
+    expect(find.text('完整样本 34 项'),findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('cat-param-category-手部')));
+    await tester.pumpAndSettle();
+    expect(find.text('右手按下'),findsOneWidget);
+    expect(find.text('匹配 2 项'),findsOneWidget);
+    expect(tester.takeException(),isNull);
+  });
+  testWidgets('Keyboard cat status panel exposes local JSON', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(
+        child:FlKeyboardCatDebugStudio(initialSection:4)))));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('cat-debug-json')),findsOneWidget);
+    expect(find.text('调试状态与快照'),findsOneWidget);
+    expect(tester.takeException(),isNull);
+  });
+
   testWidgets('Keyboard cat function binding and preview modes', (tester) async {
     await tester.pumpWidget(const MaterialApp(home:Scaffold(
       body:SingleChildScrollView(child:FlKeyboardCatDebugStudio()))));
