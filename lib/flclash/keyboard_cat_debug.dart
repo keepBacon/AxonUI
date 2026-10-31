@@ -30,22 +30,46 @@ class _FlKeyboardCatDebugStudioState extends State<FlKeyboardCatDebugStudio> {
   bool active=true;
   String activeToken='param:Param3',query='';
   int previewCount=0;
+  String parameterCategory='全部',actionCategory='全部';
+  bool modifiedOnly=false,lockedOnly=false;
+  String? bindingNotice;
   // These are real ids and names from the sample cdi3.json.
-  static const params=< _CatItem>[
+  // All 34 IDs/names from bundled sample CDI3, grouped by UI semantics.
+  static const params=<_CatItem>[
     _CatItem('ParamAngleX','角度 X','姿态'),
     _CatItem('ParamAngleY','角度 Y','姿态'),
     _CatItem('CatParamRightHandDown','右手按下','手部'),
     _CatItem('CatParamLeftHandDown','左手按下','手部'),
+    _CatItem('ParamAngleZ','角度 Z','姿态'),
+    _CatItem('ParamEyeLOpen','左眼 开闭','表情'),
+    _CatItem('ParamEyeLSmile','左眼 微笑','表情'),
+    _CatItem('ParamEyeROpen','右眼','表情'),
+    _CatItem('ParamEyeRSmile','右眼 微笑','表情'),
     _CatItem('Param3','挥手','功能'),
     _CatItem('Param','开启闪电','功能'),
     _CatItem('Param2','闪电划过','功能'),
-    _CatItem('Param4','表情:thuglife','功能'),
-    _CatItem('Param5','表情:升天','功能'),
-    _CatItem('ParamEyeLOpen','左眼 开闭','表情'),
-    _CatItem('ParamEyeROpen','右眼','表情'),
+    _CatItem('Param4','表情:thuglife','表情'),
+    _CatItem('Param5','表情:升天','表情'),
     _CatItem('ParamEyeBallX','眼球 X','表情'),
+    _CatItem('ParamEyeBallY','眼球 Y','表情'),
+    _CatItem('ParamBrowLY','左眉上下','表情'),
+    _CatItem('ParamBrowRY','右眉 上下','表情'),
+    _CatItem('ParamBrowLX','左眉 左右','表情'),
+    _CatItem('ParamBrowRX','右眉 左右','表情'),
+    _CatItem('ParamBrowLAngle','左眉 角度','表情'),
+    _CatItem('ParamBrowRAngle','右眉 角度','表情'),
+    _CatItem('ParamBrowLForm','左眉 変形','表情'),
+    _CatItem('ParamBrowRForm','右眉 変形','表情'),
+    _CatItem('ParamMouthForm','嘴部 变形','表情'),
     _CatItem('ParamMouthOpenY','嘴巴 张开和闭合','表情'),
+    _CatItem('ParamCheek','脸颊','表情'),
+    _CatItem('ParamBodyAngleX','身体旋转 X','姿态'),
+    _CatItem('ParamBodyAngleY','身体旋转 Y','姿态'),
+    _CatItem('ParamBodyAngleZ','身体旋转 Z','姿态'),
     _CatItem('ParamBreath','呼吸','姿态'),
+    _CatItem('ParamHairFront','摇动 前发','头发'),
+    _CatItem('ParamHairSide','摇动 侧发','头发'),
+    _CatItem('ParamHairBack','摇动 后发','头发'),
   ];
   // Token prefixes and model actions are defined by BongoCatStyleManager.
   static const actions=< _CatAction>[
@@ -78,7 +102,7 @@ class _FlKeyboardCatDebugStudioState extends State<FlKeyboardCatDebugStudio> {
   double globalPhysics=100;
   @override void initState(){
     super.initState();
-    section=widget.initialSection.clamp(0,3);
+    section=widget.initialSection.clamp(0,4);
     for(final a in actions)actionModes[a.token]=a.defaultMode;
   }
   void _reset(){
@@ -96,14 +120,21 @@ class _FlKeyboardCatDebugStudioState extends State<FlKeyboardCatDebugStudio> {
       globalPhysics=100;
       activeToken='param:Param3';
       previewCount=0;
+      parameterCategory='全部';actionCategory='全部';
+      modifiedOnly=false;lockedOnly=false;
+      query='';bindingNotice=null;
     });
   }
   void _bind(String token,String value) {
     setState((){
       // The native store guarantees one input maps to one model action.
+      bindingNotice=null;
       if(value!='未绑定'){
         for(final key in bindings.keys.toList()){
-          if(key!=token&&bindings[key]==value)bindings.remove(key);
+          if(key!=token&&bindings[key]==value){
+            bindings.remove(key);
+            bindingNotice='已将 '+value+' 从 '+key+' 转移到 '+token;
+          }
         }
       }
       if(value=='未绑定'){bindings.remove(token);}
@@ -167,15 +198,25 @@ class _FlKeyboardCatDebugStudioState extends State<FlKeyboardCatDebugStudio> {
             style:TextStyle(color:cs.onSurfaceVariant,fontSize:10)),
         ])),
       const SizedBox(height:12),
+      FlPanel(padding:const EdgeInsets.symmetric(horizontal:13,vertical:12),
+        child:Row(children:[
+          Expanded(child:_stat('参数',params.length.toString())),
+          Expanded(child:_stat('已修改',overrides.length.toString())),
+          Expanded(child:_stat('已锁定',
+            locks.values.where((v)=>v).length.toString())),
+          Expanded(child:_stat('已绑定',bindings.length.toString())),
+        ])),
+      const SizedBox(height:12),
       FlSegmented<int>(
-        values:const [0,1,2,3],value:section,
-        label:(n)=>const ['功能','参数','表情','物理'][n],
+        values:const [0,1,2,3,4],value:section,
+        label:(n)=>const ['功能','参数','表情','物理','状态'][n],
         onChanged:(v)=>setState(()=>section=v)),
       const SizedBox(height:12),
       if(section==0)_functions()
       else if(section==1)_parameters()
       else if(section==2)_expressions()
-      else _physics(),
+      else if(section==3)_physics()
+      else _diagnostics(),
       const SizedBox(height:12),
       OutlinedButton.icon(
         key:const ValueKey('cat-debug-reset'),
@@ -186,13 +227,26 @@ class _FlKeyboardCatDebugStudioState extends State<FlKeyboardCatDebugStudio> {
   Widget _functions(){
     final cs=Theme.of(context).colorScheme;
     return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
-      _heading('模型功能与快捷键','7 个样本动作'),
+      _heading('模型功能与快捷键',actions.length.toString()+' 个样本动作'),
+      Wrap(spacing:6,runSpacing:6,children:[
+        for(final c in const ['全部','参数动作','参数序列','表情','动作'])
+          ChoiceChip(key:ValueKey('cat-action-filter-'+c),
+            label:Text(c),selected:actionCategory==c,
+            onSelected:(_)=>setState(()=>actionCategory=c)),
+      ]),
+      const SizedBox(height:10),
       FlPanel(padding:const EdgeInsets.all(14),child:Column(children:[
-        for(var i=0;i<actions.length;i++)...[
+        for(final (i,a) in actions.where((a)=>
+          actionCategory=='全部'||a.kind==actionCategory).indexed)...[
           if(i!=0)const Divider(height:22),
-          _actionRow(actions[i]),
+          _actionRow(a),
         ],
       ])),
+      if(bindingNotice!=null)Padding(
+        padding:const EdgeInsets.only(top:9),
+        child:Text(bindingNotice!,
+          key:const ValueKey('cat-bind-notice'),
+          style:TextStyle(color:cs.primary,fontSize:12))),
       const SizedBox(height:8),
       Text('绑定方式取自 KeyboardCatFunctionBindingStore：同一输入仅可绑定一个动作。',
         style:TextStyle(fontSize:11,color:cs.onSurfaceVariant)),
@@ -244,16 +298,59 @@ class _FlKeyboardCatDebugStudioState extends State<FlKeyboardCatDebugStudio> {
   }
   Widget _parameters(){
     final cs=Theme.of(context).colorScheme;
-    final filtered=params.where((p)=>p.id.toLowerCase().contains(
-      query.trim().toLowerCase())||p.name.contains(query.trim())).toList();
+    final term=query.trim().toLowerCase();
+    final filtered=params.where((p)=>
+      (p.id.toLowerCase().contains(term)||p.name.toLowerCase().contains(term))&&
+      (parameterCategory=='全部'||p.family==parameterCategory)&&
+      (!modifiedOnly||overrides.containsKey(p.id)||locks[p.id]==true)&&
+      (!lockedOnly||locks[p.id]==true)).toList();
     return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
-      _heading('Cubism 参数覆盖与锁定','归一化 0–1'),
+      _heading('Cubism 参数覆盖与锁定','完整样本 '+params.length.toString()+' 项'),
+      Wrap(spacing:6,runSpacing:6,children:[
+        for(final c in const ['全部','姿态','手部','功能','表情','头发'])
+          ChoiceChip(key:ValueKey('cat-param-category-'+c),
+            label:Text(c),selected:parameterCategory==c,
+            onSelected:(_)=>setState(()=>parameterCategory=c)),
+      ]),
+      const SizedBox(height:10),
       TextField(key:const ValueKey('cat-param-search'),
         decoration:const InputDecoration(
           prefixIcon:Icon(Icons.search_rounded),
           hintText:'搜索参数 ID / 名称',isDense:true),
         onChanged:(v)=>setState(()=>query=v)),
-      const SizedBox(height:11),
+      const SizedBox(height:10),
+      Wrap(spacing:8,runSpacing:6,crossAxisAlignment:WrapCrossAlignment.center,
+        children:[
+          FilterChip(key:const ValueKey('cat-filter-modified'),
+            label:const Text('仅修改项'),selected:modifiedOnly,
+            onSelected:(v)=>setState(()=>modifiedOnly=v)),
+          FilterChip(key:const ValueKey('cat-filter-locked'),
+            label:const Text('仅锁定项'),selected:lockedOnly,
+            onSelected:(v)=>setState(()=>lockedOnly=v)),
+          Text('匹配 '+filtered.length.toString()+' 项',
+            key:const ValueKey('cat-filter-count'),
+            style:TextStyle(fontSize:12,color:cs.onSurfaceVariant)),
+        ]),
+      Row(children:[
+        TextButton.icon(
+          key:const ValueKey('cat-reset-filtered'),
+          onPressed:filtered.isEmpty?null:()=>setState((){
+            for(final p in filtered){
+              overrides.remove(p.id);locks.remove(p.id);
+            }
+          }),
+          icon:const Icon(Icons.restart_alt_rounded,size:18),
+          label:const Text('重置筛选结果')),
+        const Spacer(),
+        TextButton(
+          key:const ValueKey('cat-clear-filters'),
+          onPressed:()=>setState((){
+            query='';parameterCategory='全部';
+            modifiedOnly=false;lockedOnly=false;
+          }),
+          child:const Text('清除筛选')),
+      ]),
+      const SizedBox(height:7),
       FlPanel(padding:const EdgeInsets.all(14),child:Column(children:[
         if(filtered.isEmpty)const Text('没有匹配的样本参数'),
         for(final (i,p) in filtered.indexed)...[
@@ -262,7 +359,7 @@ class _FlKeyboardCatDebugStudioState extends State<FlKeyboardCatDebugStudio> {
         ],
       ])),
       const SizedBox(height:8),
-      Text('参数标签来自样本 cdi3；覆盖值与锁定是两套独立的 UI 状态。',
+      Text('完整 34 项参数名称来自原始 cdi3；归一化演示值不代表真实 Cubism 参数范围。',
         style:TextStyle(fontSize:11,color:cs.onSurfaceVariant)),
     ]);
   }
@@ -391,6 +488,15 @@ class _FlKeyboardCatDebugStudioState extends State<FlKeyboardCatDebugStudio> {
         style:TextStyle(color:cs.onSurfaceVariant,fontSize:11)),
     ]);
   }
+  Widget _stat(String label,String value){
+    final cs=Theme.of(context).colorScheme;
+    return Column(mainAxisSize:MainAxisSize.min,children:[
+      Text(value,style:TextStyle(fontSize:18,
+        fontWeight:FontWeight.w800,color:cs.primary)),
+      Text(label,style:TextStyle(fontSize:10,color:cs.onSurfaceVariant)),
+    ]);
+  }
+
   Widget _heading(String title,String subtitle){
     final cs=Theme.of(context).colorScheme;
     return Padding(padding:const EdgeInsets.fromLTRB(2,6,2,12),
