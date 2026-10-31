@@ -51,9 +51,7 @@ class FlKeyDisplayScreen extends StatelessWidget {
         _entry(context,'自定义',Icons.dashboard_customize_outlined,
           PreviewCatalog.custom,'外观与动效'),
       ]),
-      const FlShowcaseSection(title:'交互预览',icon:Icons.tune_rounded),
-      const FlShowcaseInteractionPreview(),
-    ],
+     ],
   );
 
   Widget _entry(BuildContext context,String title,IconData icon,

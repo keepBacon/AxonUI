@@ -76,12 +76,43 @@ void main(){
         child:FilledButton(
           onPressed:()=>openPreviewFeatures(
             context,'键鼠',PreviewCatalog.keyboard),
-          child:const Text('打开分类')))),
+          child:const Text('打开分类'))))),
     ));
     await tester.tap(find.text('打开分类'));
     await tester.pumpAndSettle();
     expect(find.text('键鼠'),findsOneWidget);
     expect(find.byType(FlShowcasePageSurface),findsOneWidget);
+    expect(tester.takeException(),isNull);
+  });
+
+  testWidgets('Showcase preview opacity is controlled locally',
+    (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(
+      body: Center(child: SizedBox(width: 360,
+        child: FlShowcaseInteractionPreview())),
+    )));
+    await tester.pumpAndSettle();
+    final fade=find.byKey(const ValueKey('showcase-preview-opacity'));
+    final initial=tester.widget<AnimatedOpacity>(fade).opacity;
+    expect(initial, closeTo(.64, .001));
+    final slider=find.byKey(const ValueKey('showcase-preview-slider'));
+    await tester.drag(slider, const Offset(120, 0));
+    await tester.pumpAndSettle();
+    expect(tester.widget<AnimatedOpacity>(fade).opacity, greaterThan(initial));
+    expect(tester.takeException(),isNull);
+  });
+
+  testWidgets('Dense catalogue remains separate from debug panels',
+    (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: Scaffold(
+      body: FlKeyDisplayScreen(),
+    )));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('entry-arrow-键鼠')),findsOneWidget);
+    expect(find.byKey(const ValueKey('entry-arrow-手柄')),findsOneWidget);
+    expect(find.byKey(const ValueKey('entry-arrow-自定义')),findsOneWidget);
+    expect(find.byType(FlShowcaseInteractionPreview),findsNothing);
+    expect(find.byKey(const ValueKey('color-debug-preview')),findsNothing);
     expect(tester.takeException(),isNull);
   });
 

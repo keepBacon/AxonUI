@@ -167,10 +167,11 @@ class _FlShowcaseInteractionPreviewState
           child:AnimatedScale(
             duration:FlMotion.effective(context,FlMotion.selection),
             curve:FlMotion.curve,
-            scale:motion=='缩放'?.92:1,
+            scale:motion == '缩放' ? .92 : 1,
             child:AnimatedOpacity(
               duration:FlMotion.effective(context,FlMotion.regular),
-              opacity:motion=='淡入'?.66:1,
+              key: const ValueKey('showcase-preview-opacity'),
+              opacity:(motion == '淡入' ? .66 : 1) * value / 100,
               child:FlPressScale(pressedScale:.94,
                 child:FilledButton.tonal(
                   key:const ValueKey('showcase-preview-button'),
