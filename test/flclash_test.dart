@@ -45,6 +45,8 @@ void main(){
     await tester.tap(find.byKey(const ValueKey('axon-media-add')));
     await tester.pumpAndSettle();
     expect(find.text('素材列表 · 3'),findsOneWidget);
+    await tester.ensureVisible(find.byKey(const ValueKey('axon-media-chroma')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('axon-media-chroma')));
     await tester.pumpAndSettle();
     expect(find.text('抠像强度'),findsOneWidget);
