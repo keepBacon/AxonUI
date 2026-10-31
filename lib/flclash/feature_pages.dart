@@ -213,6 +213,7 @@ class FlFeatureDebugScreen extends StatelessWidget {
     PreviewKind.layout=>const FlSpacingDebug(),
     PreviewKind.media=>_LocalMediaSample(title:title),
     PreviewKind.plugin=>_LocalSettingsSample(title:title),
+    PreviewKind.source=>FlSourceFeatureSample(title:title),
   };
 }
 
@@ -335,4 +336,120 @@ class _LocalMediaSampleState extends State<_LocalMediaSample> {
     Slider(value:scale,min:.5,max:1.5,
       onChanged:(v)=>setState(()=>scale=v)),
   ]));
+}
+
+class FlSourceFeatureSample extends StatefulWidget {
+  const FlSourceFeatureSample({super.key,required this.title});
+  final String title;
+  @override State<FlSourceFeatureSample> createState()=>_FlSourceFeatureSampleState();
+}
+class _FlSourceFeatureSampleState extends State<FlSourceFeatureSample> {
+  bool enabled=false;
+  final Map<String,double> values={};
+  final Map<String,bool> switches={};
+  final Map<String,int> options={};
+  static const Map<String,List<String>> specs={
+    '常规按显':['键盘大小','键盘间距','空格键高度','鼠标按键高度','显示空格键','显示空格键 CPS','空格键内容显示为横杠','左右键显示','左右键与空格位置交换','左右键 CPS 显示'],
+    '输入时显示全键盘':['全键盘大小'],
+    '鼠标按显':['鼠标按键大小'],
+    '键盘猫显示':['模型大小','模型风格','表情选择','方向键变为鼠标','全局反转'],
+    '最近按键':['显示大小'],
+    '鼠标轨迹':['轨迹大小','轨迹圆点大小','左键按下颜色','右键按下颜色'],
+    '自定义鼠标指针':['鼠标指针外观','指针诊断模式'],
+    '左摇杆':['摇杆大小','中心圆点大小','圆角强度','描边宽度','中心圆点圆角','颜色调试','透明度调试'],
+    '右摇杆':['摇杆大小','中心圆点大小','圆角强度','描边宽度','中心圆点圆角','颜色调试','透明度调试'],
+    'ABXY 按键':['按键大小','按键间距','颜色调试','透明度调试','按压动画调试','反转 ABXY 位置','△○□X 图标','显示 Y 键 CPS','显示 X 键 CPS','显示 B 键 CPS','显示 A 键 CPS'],
+    '十字键显示':['按键大小','颜色调试','透明度调试','按压动画调试'],
+    '左肩键':['按键大小','颜色调试','透明度调试','显示 L2 压力','显示 L1 CPS'],
+    '右肩键':['按键大小','颜色调试','透明度调试','显示 R2 压力','显示 R1 CPS'],
+    '背键显示':['按键大小','颜色调试','透明度调试'],
+    '兼容模式':['兼容模式选项','交换 X / Y','交换 A / B','交换左右摇杆','交换 L2 / R2','按键交换'],
+    '独立按键交换':['交换 X / Y','交换 A / B','交换左右摇杆','交换 L2 / R2'],
+    '自定义控件':['控件类型','宽度','高度','圆角','背景透明度','边框透明度','文字透明度','按压扩散透明度','文字大小','描边宽度','颜色调试','按压动画调试'],
+    '按键控件':['宽度','高度','圆角','按键背景颜色','按下颜色','边框颜色','文字颜色','按压动画调试'],
+    '文本控件':['宽度','高度','文字大小','文字描边','文字描边宽度','文字阴影','CPS 文本'],
+    '摇杆控件':['左摇杆 / 右摇杆','摇杆大小','圆点尺寸','圆点圆角','背景颜色','透明度'],
+    '控件位置与尺寸':['X 位置','Y 位置','宽度','高度'],
+    '插件 UI 配置':['功能开关','功能按钮','滑块','颜色','单选','数值','文本','键位','开关','列表','绑定'],
+    'Live2D':['模型大小','物理强度','Physics 组','表情调试','参数调试','全套动作捕捉','捕捉鼠标','去水印'],
+    'Web 插件显示':['显示方式','布局位置','显示比例'],
+    'CPS 显示':['统计目标','显示大小','颜色调试','透明度调试'],
+    '修改字体':['字体选择','字体大小'],
+    '灵敏度倍率':['倍率'],
+    '同时点击':['组合列表'],
+    '隐藏按显快捷键':['快捷键外观','目标选择'],
+  };
+  bool _isToggle(String x)=>x.startsWith('显示')||x.startsWith('交换')||
+    x.contains('启用')||x.contains('反转')||x.contains('图标')||
+    x.contains('捕捉')||x.contains('去水印')||x.contains('诊断模式');
+  bool _isSelection(String x)=>x.contains('模式')||x.contains('类型')||
+    x.contains('风格')||x.contains('选择')||x.contains('组')||
+    x.contains('左摇杆 /');
+  @override Widget build(BuildContext context) {
+    final params=specs[widget.title]??const <String>[];
+    final cs=Theme.of(context).colorScheme;
+    return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
+      FlGroup(children:[FlToggleRow(
+        key:const ValueKey('source-feature-toggle'),
+        title:widget.title,icon:Icons.tune_rounded,value:enabled,
+        onChanged:(v)=>setState(()=>enabled=v))]),
+      const SizedBox(height:14),
+      if(params.isNotEmpty) FlPanel(child:Column(
+        crossAxisAlignment:CrossAxisAlignment.stretch,children:[
+          for(final param in params)...[
+            if(param.contains('颜色调试')||param.contains('背景颜色')||
+                param.contains('文字颜色')||param.contains('边框颜色')||
+                param.contains('按下颜色'))
+              _colorRow(param,cs)
+            else if(_isToggle(param))
+              SwitchListTile.adaptive(
+                contentPadding:EdgeInsets.zero,title:Text(param),
+                value:switches[param]??false,
+                onChanged:(v)=>setState(()=>switches[param]=v))
+            else if(_isSelection(param))
+              _selectRow(param)
+            else _sliderRow(param),
+            const SizedBox(height:6),
+          ],
+        ])),
+      if(params.isEmpty) FlPanel(child:Column(children:[
+        Text(widget.title,style:const TextStyle(fontSize:17)),
+        const SizedBox(height:12),
+        FlSegmented<String>(values:const ['默认','选项一','选项二'],
+          label:(x)=>x,value:['默认','选项一','选项二'][
+            options['generic']??0],
+          onChanged:(x)=>setState(()=>options['generic']=
+            ['默认','选项一','选项二'].indexOf(x))),
+      ])),
+    ]);
+  }
+  Widget _sliderRow(String name) {
+    final value=values[name]??50;
+    return Column(children:[
+      Row(children:[Expanded(child:Text(name)),
+        Text('${value.round()}',style:const TextStyle(fontSize:12))]),
+      Slider(value:value,min:0,max:100,
+        onChanged:(x)=>setState(()=>values[name]=x)),
+    ]);
+  }
+  Widget _selectRow(String name) {
+    const choices=['自动','标准','自定义'];
+    return Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+      Text(name),const SizedBox(height:8),
+      FlSegmented<String>(values:choices,label:(s)=>s,
+        value:choices[options[name]??0],
+        onChanged:(v)=>setState(()=>options[name]=choices.indexOf(v))),
+    ]);
+  }
+  Widget _colorRow(String name,ColorScheme cs)=>Padding(
+    padding:const EdgeInsets.symmetric(vertical:6),
+    child:Row(children:[
+      Expanded(child:Text(name)),
+      for(final c in [cs.primary,cs.tertiary,cs.secondary]) Padding(
+        padding:const EdgeInsets.only(left:8),
+        child:InkWell(
+          onTap:()=>setState(()=>options[name]=c.toARGB32()),
+          child:CircleAvatar(radius:15,backgroundColor:c))),
+    ]),
+  );
 }
