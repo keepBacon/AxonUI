@@ -13,8 +13,9 @@ import 'showcase_mosaic.dart';
 
 /// Top-level preview navigation: four tabs, no device or network backend.
 class FlPreviewHomeScreen extends StatelessWidget {
-  const FlPreviewHomeScreen({super.key, required this.onSelect});
+  const FlPreviewHomeScreen({super.key, required this.onSelect,this.glass=2});
   final ValueChanged<int> onSelect;
+  final int glass;
   @override Widget build(BuildContext context) {
     final featureCount=[
       ...PreviewCatalog.keyboard,...PreviewCatalog.gamepad,
@@ -27,7 +28,7 @@ class FlPreviewHomeScreen extends StatelessWidget {
       children:[
         const FlShowcaseHeader(title:'主页'),
         const SizedBox(height:15),
-        FlShowcaseHero(features:featureCount),
+        FlShowcaseHero(features:featureCount,glass:glass),
         const FlShowcaseSection(title:'分类',icon:Icons.grid_view_outlined),
         SizedBox(height:104,child:FlShowcaseCategoryTile(
           title:'键显',detail:'键鼠 · 手柄 · 自定义',
@@ -54,7 +55,9 @@ class FlPreviewHomeScreen extends StatelessWidget {
           FlShowcaseSpecimenTile(title:'玻璃材质',kind:'glass',
             caption:'表面效果'),
         ]),
-        const FlShowcaseSection(title:'交互动效',icon:Icons.animation_outlined),
+        const FlShowcaseSection(title:'交互与材质',icon:Icons.animation_outlined),
+        const FlShowcasePreviewRibbon(),
+        const SizedBox(height:12),
         const FlShowcaseInteractionPreview(),
       ],
     );
@@ -96,7 +99,7 @@ class FlKeyDisplayScreen extends StatelessWidget {
           onTap:()=>openPreviewFeature(context,
             PreviewCatalog.custom[2].features.first)),
       ]),
-      const FlShowcaseSection(title:'样式预览',icon:Icons.keyboard_alt_outlined),
+      const FlShowcaseSection(title:'实时演示',icon:Icons.keyboard_alt_outlined),
       const FlKeyboardShowcaseSample(),
     ],
   );
@@ -104,6 +107,7 @@ class FlKeyDisplayScreen extends StatelessWidget {
   Widget _entry(BuildContext context,String title,IconData icon,
       List<PreviewGroup> groups,String subtitle) => FlShowcaseEntry(
     title:title,icon:icon,subtitle:subtitle,height:72,
+    visual:FlCategoryMiniature(kind:title),
     arrowKey:ValueKey('entry-arrow-$title'),
     onTap:()=>openPreviewFeatures(context,title,groups));
 }
@@ -113,8 +117,10 @@ class FlPluginShowcaseScreen extends StatelessWidget {
   @override Widget build(BuildContext context)=>FlFeatureGroupsScreen(
     title:'插件',groups:PreviewCatalog.plugins,isRoot:true,
     leadingWidgets:const [
-      FlShowcaseSection(title:'组件操作台',icon:Icons.widgets_outlined),
+      FlShowcaseSection(title:'基础开关与参数',icon:Icons.widgets_outlined),
       FlPluginWorkbench(),
+      FlShowcaseSection(title:'列表与绑定编辑',icon:Icons.format_list_numbered_outlined),
+      FlPluginEditorPreview(),
       FlShowcaseSection(title:'控件类型',icon:Icons.view_quilt_outlined),
       FlShowcaseSpecimenGrid(children:[
         FlShowcaseSpecimenTile(title:'开关',kind:'switch'),
@@ -122,6 +128,14 @@ class FlPluginShowcaseScreen extends StatelessWidget {
         FlShowcaseSpecimenTile(title:'颜色',kind:'color'),
         FlShowcaseSpecimenTile(title:'文字',kind:'text'),
       ]),
+      FlShowcaseSection(title:'调试预览',icon:Icons.build_circle_outlined),
+      FlShowcaseSpecimenGrid(children:[
+        FlShowcaseSpecimenTile(title:'颜色调试',kind:'color'),
+        FlShowcaseSpecimenTile(title:'动画调试',kind:'motion'),
+        FlShowcaseSpecimenTile(title:'材质调试',kind:'glass'),
+        FlShowcaseSpecimenTile(title:'文本效果',kind:'text'),
+      ]),
+      FlShowcaseSection(title:'功能映射',icon:Icons.account_tree_outlined),
     ]);
 }
 

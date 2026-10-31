@@ -62,15 +62,16 @@ class _FlClashAxonAppState extends State<FlClashAxonApp>{
           onBack:()=>setState(()=>_themeOpen=false),mode:_mode,seed:_seed,
           onMode:_setMode,onSeed:_setSeed,glass:_glass,onGlass:_setGlass,store:_store)
         : FlNavigationShell(key:const ValueKey('shell'),
-          openTheme:()=>setState(()=>_themeOpen=true)),
+          glass:_glass,openTheme:()=>setState(()=>_themeOpen=true)),
     ))))),
   );
 }
 
 /// FlClash-like navigation, pill indicator, blur, and animated tab pages.
 class FlNavigationShell extends StatefulWidget {
-  const FlNavigationShell({super.key,required this.openTheme});
+  const FlNavigationShell({super.key,required this.openTheme,this.glass=2});
   final VoidCallback openTheme;
+  final int glass;
   @override
   State<FlNavigationShell> createState()=>_FlNavigationShellState();
 }
@@ -79,7 +80,8 @@ class _FlNavigationShellState extends State<FlNavigationShell>{
   @override
   Widget build(BuildContext context){
     final pages=<Widget>[
-      FlPreviewHomeScreen(onSelect:(i)=>setState(()=>_selected=i)),
+      FlPreviewHomeScreen(glass:widget.glass,
+        onSelect:(i)=>setState(()=>_selected=i)),
       const FlKeyDisplayScreen(),
       const FlPluginShowcaseScreen(),
       FlOtherShowcaseScreen(openTheme:widget.openTheme),

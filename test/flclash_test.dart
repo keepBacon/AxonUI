@@ -34,6 +34,33 @@ void main(){
     expect(tester.takeException(),isNull);
   });
 
+  testWidgets('Showcase hero material and interactive miniature',
+    (tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(child:FlShowcaseHero(features:42,glass:1)))));
+    await tester.pumpAndSettle();
+    expect(find.text('当前材质：标准玻璃'),findsOneWidget);
+    final preview=find.byKey(const ValueKey('hero-live-preview'));
+    expect(preview,findsOneWidget);
+    await tester.tap(preview);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(),isNull);
+  });
+
+  testWidgets('Plugin list sample reorders and binds locally',
+    (tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(child:FlPluginEditorPreview()))));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('plugin-move-1')));
+    await tester.pumpAndSettle();
+    expect(find.text('触控层'),findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('plugin-demo-bind')));
+    await tester.pumpAndSettle();
+    expect(find.text('快捷键 · Ctrl + K'),findsOneWidget);
+    expect(tester.takeException(),isNull);
+  });
+
   testWidgets('Four navigation tabs are present',(tester)async{
     await tester.pumpWidget(FlClashAxonApp(store:FlMemoryStore()));
     await tester.pumpAndSettle();

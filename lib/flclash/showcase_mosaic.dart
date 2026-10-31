@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'controls.dart';
 import 'theme.dart';
+import 'motion.dart';
 
 /// Presentation-only widgets. This file has no platform channel,
 /// device listener, plugin runtime or key-event handling.
 class FlShowcaseHero extends StatelessWidget {
-  const FlShowcaseHero({super.key,required this.features});
-  final int features;
+  const FlShowcaseHero({super.key,required this.features,this.glass=2});
+  final int features,glass;
   @override Widget build(BuildContext context) {
     final cs=Theme.of(context).colorScheme;
     return Container(
       key:const ValueKey('showcase-hero'),
-      height:178,padding:const EdgeInsets.fromLTRB(20,19,14,18),
+      height:194,padding:const EdgeInsets.fromLTRB(20,19,14,18),
       decoration:BoxDecoration(
         borderRadius:BorderRadius.circular(29),
         gradient:LinearGradient(
@@ -26,27 +27,21 @@ class FlShowcaseHero extends StatelessWidget {
             Text('组件概览',style:TextStyle(
               color:cs.onSurface,fontWeight:FontWeight.w700,fontSize:19)),
             const SizedBox(height:5),
-            Text('预览与交互',style:TextStyle(
-              fontSize:12,color:cs.onSurfaceVariant)),
+            Text('交互式 UI 展示 · 仅本地状态',style:TextStyle(
+              fontSize:11,color:cs.onSurfaceVariant)),
             const Spacer(),
             Row(children:[
               _value(context,'$features','展示项'),
               const SizedBox(width:17),
               _value(context,'4','分类页'),
             ]),
+            const SizedBox(height:7),
+            Text('当前主题：'+(Theme.of(context).brightness==Brightness.dark?'深色':'浅色'),
+              style:TextStyle(fontSize:11,color:cs.onSurfaceVariant)),
+            Text('当前材质：'+(glass==0?'普通':glass==1?'标准玻璃':'强玻璃'),
+              style:TextStyle(fontSize:11,color:cs.onSurfaceVariant)),
           ])),
-        Expanded(flex:4,child:LayoutBuilder(builder:(context,box)=>
-          Stack(alignment:Alignment.center,children:[
-            Positioned(right:3,top:2,child:Transform.rotate(
-              angle:.12,child:_tile(cs.tertiary.withValues(alpha:.20),
-                Icons.palette_outlined,cs.primary,65))),
-            Positioned(left:0,top:30,child:Transform.rotate(
-              angle:-.13,child:_tile(cs.surface.withValues(alpha:.88),
-                Icons.tune_rounded,cs.onSurface,74))),
-            Positioned(right:16,bottom:5,child:_tile(
-              cs.primary.withValues(alpha:.92),
-              Icons.auto_awesome_motion_rounded,cs.onPrimary,64)),
-          ]))),
+        const Expanded(flex:4,child:FlHeroMiniPreview()),
       ]),
     );
   }
@@ -57,12 +52,6 @@ class FlShowcaseHero extends StatelessWidget {
       Text(caption,style:TextStyle(fontSize:11,
         color:Theme.of(context).colorScheme.onSurfaceVariant)),
     ]);
-  Widget _tile(Color bg,IconData icon,Color fg,double size)=>
-    Container(width:size,height:size,alignment:Alignment.center,
-      decoration:BoxDecoration(color:bg,borderRadius:BorderRadius.circular(20),
-        boxShadow:const [BoxShadow(
-          color:Color(0x13000000),blurRadius:13,offset:Offset(0,4))]),
-      child:Icon(icon,size:28,color:fg));
 }
 
 class FlShowcaseCategoryTile extends StatelessWidget {
@@ -89,7 +78,9 @@ class FlShowcaseCategoryTile extends StatelessWidget {
               Row(children:[
                 Icon(icon,size:25,color:cs.primary),
                 const Spacer(),
-                Icon(Icons.arrow_outward_rounded,size:18,
+                FlCategoryMiniature(kind:title),
+                const SizedBox(width:4),
+                Icon(Icons.arrow_outward_rounded,size:16,
                   color:cs.onSurfaceVariant),
               ]),
               const Spacer(),
@@ -229,6 +220,8 @@ class FlKeyboardShowcaseSample extends StatefulWidget {
 class _FlKeyboardShowcaseSampleState
     extends State<FlKeyboardShowcaseSample> {
   bool highlighted=true;
+  int presses=8;
+  String lastKey='W';
   @override Widget build(BuildContext context){
     final cs=Theme.of(context).colorScheme;
     return FlPanel(padding:const EdgeInsets.all(17),child:Column(
@@ -249,36 +242,66 @@ class _FlKeyboardShowcaseSampleState
             mainAxisSize:MainAxisSize.min,children:[
               Row(mainAxisAlignment:MainAxisAlignment.center,children:[
                 for(final key in ['Q','W','E','R','T','Y'])
-                  _key(cs,key,highlighted&&key=='W'),
+                  _key(cs,key,highlighted&&key==lastKey),
               ]),
               Row(mainAxisAlignment:MainAxisAlignment.center,children:[
                 for(final key in ['A','S','D','F','G'])
-                  _key(cs,key,highlighted&&key=='A'),
+                  _key(cs,key,highlighted&&key==lastKey),
               ]),
               Row(mainAxisAlignment:MainAxisAlignment.center,children:[
                 _key(cs,'CTRL',false,w:44),
-                _key(cs,'SPACE',highlighted,w:115),
+                _key(cs,'SPACE',highlighted&&lastKey=='SPACE',w:115),
                 _key(cs,'ALT',false,w:43),
               ]),
             ],
           ))),
         const SizedBox(height:10),
-        Text('模拟视觉反馈 · 不读取设备输入',
+        Row(children:[
+          _mouseButton(cs,'LMB',highlighted),
+          const SizedBox(width:6),
+          _mouseButton(cs,'RMB',false),
+          const Spacer(),
+          Text('CPS 示例 ${highlighted?presses:0}',
+            key:const ValueKey('keyboard-demo-cps'),
+            style:TextStyle(color:cs.primary,fontWeight:FontWeight.w700,
+              fontSize:12)),
+        ]),
+        const SizedBox(height:8),
+        Text('点击键帽可模拟反馈 · 不读取设备输入',
           style:TextStyle(fontSize:11,color:cs.onSurfaceVariant)),
       ],
     ));
   }
   Widget _key(ColorScheme cs,String label,bool active,{double w=34})=>
-    AnimatedContainer(
-      duration:FlMotion.effective(context,FlMotion.short),
-      width:w,height:25,margin:const EdgeInsets.all(2),
-      alignment:Alignment.center,
-      decoration:BoxDecoration(
-        color:active?cs.primary:cs.surface,
-        borderRadius:BorderRadius.circular(7)),
-      child:Text(label,style:TextStyle(
-        fontWeight:FontWeight.w700,fontSize:10,
-        color:active?cs.onPrimary:cs.onSurfaceVariant)),
+    GestureDetector(
+      key:ValueKey('keyboard-key-$label'),
+      behavior:HitTestBehavior.opaque,
+      onTap:()=>setState((){lastKey=label;presses++;highlighted=true;}),
+      child:AnimatedContainer(
+        duration:FlMotion.effective(context,FlMotion.short),
+        width:w,height:25,margin:const EdgeInsets.all(2),
+        alignment:Alignment.center,
+        decoration:BoxDecoration(
+          color:active?cs.primary:cs.surface,
+          borderRadius:BorderRadius.circular(7)),
+        child:Text(label,style:TextStyle(
+          fontWeight:FontWeight.w700,fontSize:10,
+          color:active?cs.onPrimary:cs.onSurfaceVariant)),
+      ),
+    );
+  Widget _mouseButton(ColorScheme cs,String label,bool active)=>
+    InkWell(
+      key:ValueKey('keyboard-mouse-$label'),
+      borderRadius:BorderRadius.circular(9),
+      onTap:()=>setState((){lastKey=label;presses++;highlighted=true;}),
+      child:Container(
+        padding:const EdgeInsets.symmetric(horizontal:11,vertical:7),
+        decoration:BoxDecoration(
+          color:active?cs.primary.withValues(alpha:.16):cs.surfaceContainerHigh,
+          borderRadius:BorderRadius.circular(9)),
+        child:Text(label,style:TextStyle(
+          fontSize:11,fontWeight:FontWeight.w700,color:cs.onSurface)),
+      ),
     );
 }
 
@@ -379,5 +402,185 @@ class _FlPluginWorkbenchState extends State<FlPluginWorkbench> {
         )),
       ]),
     ]);
+  }
+}
+
+
+/// Compact stateful specimen in the hero; taps change only this preview.
+class FlHeroMiniPreview extends StatefulWidget {
+  const FlHeroMiniPreview({super.key});
+  @override State<FlHeroMiniPreview> createState()=>_FlHeroMiniPreviewState();
+}
+class _FlHeroMiniPreviewState extends State<FlHeroMiniPreview> {
+  int sample=0;
+  @override Widget build(BuildContext context) {
+    final cs=Theme.of(context).colorScheme;
+    final shades=[cs.primary,cs.tertiary,cs.secondary];
+    final color=shades[sample];
+    return InkWell(
+      key:const ValueKey('hero-live-preview'),
+      onTap:()=>setState(()=>sample=(sample+1)%shades.length),
+      borderRadius:BorderRadius.circular(23),
+      child:AnimatedContainer(
+        duration:FlMotion.effective(context,FlMotion.regular),
+        curve:Curves.easeOutCubic,
+        padding:const EdgeInsets.all(10),
+        decoration:BoxDecoration(
+          color:color.withValues(alpha:.14),
+          borderRadius:BorderRadius.circular(23),
+          border:Border.all(color:color.withValues(alpha:.22))),
+        child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[
+          Text('动态小样',style:TextStyle(fontSize:10,
+            color:cs.onSurfaceVariant)),
+          const SizedBox(height:9),
+          AnimatedContainer(
+            duration:FlMotion.effective(context,FlMotion.regular),
+            width:48,height:48,
+            decoration:BoxDecoration(color:color,shape:BoxShape.circle),
+            child:Icon(Icons.auto_awesome_rounded,color:cs.onPrimary,size:24)),
+          const SizedBox(height:10),
+          Row(mainAxisAlignment:MainAxisAlignment.center,children:[
+            for(var i=0;i<shades.length;i++)
+              Container(width:i==sample?15:6,height:6,
+                margin:const EdgeInsets.symmetric(horizontal:2),
+                decoration:BoxDecoration(
+                  color:i==sample?color:cs.outlineVariant,
+                  borderRadius:BorderRadius.circular(5))),
+          ]),
+          const SizedBox(height:5),
+          Text('轻触切换',style:TextStyle(fontSize:9,
+            color:cs.onSurfaceVariant)),
+        ]),
+      ),
+    );
+  }
+}
+
+/// Meaningful category illustrations instead of identical right-side icons.
+class FlCategoryMiniature extends StatelessWidget {
+  const FlCategoryMiniature({super.key,required this.kind});
+  final String kind;
+  @override Widget build(BuildContext context) {
+    final cs=Theme.of(context).colorScheme;
+    Widget child;
+    if(kind=='键显'||kind=='键鼠'){
+      child=Wrap(spacing:2,children:[
+        for(final k in ['W','A','S','D'])
+          Container(width:13,height:16,alignment:Alignment.center,
+            decoration:BoxDecoration(
+              color:k=='W'?cs.primary:cs.surfaceContainerHighest,
+              borderRadius:BorderRadius.circular(4)),
+            child:Text(k,style:TextStyle(fontSize:8,
+              color:k=='W'?cs.onPrimary:cs.onSurface))),
+      ]);
+    }else if(kind=='插件'){
+      child=Row(mainAxisAlignment:MainAxisAlignment.center,children:[
+        Icon(Icons.toggle_on_rounded,size:27,color:cs.primary),
+        const SizedBox(width:3),
+        Container(width:19,height:5,decoration:BoxDecoration(
+          color:cs.tertiary,borderRadius:BorderRadius.circular(5))),
+      ]);
+    }else if(kind=='手柄'){
+      child=Icon(Icons.sports_esports_rounded,size:29,color:cs.primary);
+    }else{
+      child=Row(mainAxisAlignment:MainAxisAlignment.center,children:[
+        for(final c in [cs.primary,cs.tertiary,cs.secondary])
+          Container(width:13,height:19,margin:const EdgeInsets.all(2),
+            decoration:BoxDecoration(color:c,
+              borderRadius:BorderRadius.circular(6))),
+      ]);
+    }
+    return SizedBox(key:ValueKey('category-thumb-$kind'),
+      width:73,height:32,child:Center(child:child));
+  }
+}
+
+/// Horizontal strip deliberately breaks up the two-column card rhythm.
+class FlShowcasePreviewRibbon extends StatelessWidget {
+  const FlShowcasePreviewRibbon({super.key});
+  @override Widget build(BuildContext context) {
+    final cs=Theme.of(context).colorScheme;
+    return SingleChildScrollView(
+      key:const ValueKey('showcase-ribbon'),
+      scrollDirection:Axis.horizontal,
+      child:Row(children:[
+        _chip(cs,Icons.touch_app_rounded,'按压反馈'),
+        _chip(cs,Icons.water_drop_outlined,'液态材质'),
+        _chip(cs,Icons.palette_outlined,'动态配色'),
+        _chip(cs,Icons.motion_photos_on_rounded,'页面过渡'),
+      ]),
+    );
+  }
+  Widget _chip(ColorScheme cs,IconData icon,String label)=>Container(
+    margin:const EdgeInsets.only(right:8),
+    padding:const EdgeInsets.symmetric(horizontal:13,vertical:11),
+    decoration:BoxDecoration(
+      color:cs.surfaceContainerLow,borderRadius:BorderRadius.circular(16)),
+    child:Row(mainAxisSize:MainAxisSize.min,children:[
+      Icon(icon,size:19,color:cs.primary),
+      const SizedBox(width:7),
+      Text(label,style:TextStyle(fontSize:12,color:cs.onSurface)),
+    ]),
+  );
+}
+
+/// Reorder and binding samples use local state; no plugin executor is involved.
+class FlPluginEditorPreview extends StatefulWidget {
+  const FlPluginEditorPreview({super.key});
+  @override State<FlPluginEditorPreview> createState()=>_FlPluginEditorPreviewState();
+}
+class _FlPluginEditorPreviewState extends State<FlPluginEditorPreview> {
+  final items=['显示层','触控层','动效层'];
+  final selected=<String>{'显示层'};
+  bool bound=false;
+  void _moveUp(int index){
+    if(index==0)return;
+    setState((){
+      final item=items.removeAt(index);
+      items.insert(index-1,item);
+    });
+  }
+  @override Widget build(BuildContext context){
+    final cs=Theme.of(context).colorScheme;
+    return FlPanel(padding:const EdgeInsets.all(15),
+      child:Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
+        Row(children:[
+          Icon(Icons.drag_indicator_rounded,color:cs.primary),
+          const SizedBox(width:8),
+          Expanded(child:Text('排序与多选',style:TextStyle(
+            fontSize:14,fontWeight:FontWeight.w700,color:cs.onSurface))),
+          Text('本地状态',style:TextStyle(fontSize:10,
+            color:cs.onSurfaceVariant)),
+        ]),
+        const SizedBox(height:8),
+        for(var i=0;i<items.length;i++)
+          Padding(padding:const EdgeInsets.only(bottom:4),child:Row(children:[
+            Checkbox(
+              key:ValueKey('plugin-check-$i'),
+              value:selected.contains(items[i]),
+              onChanged:(v)=>setState((){
+                if(v==true){selected.add(items[i]);}
+                else{selected.remove(items[i]);}
+              })),
+            Expanded(child:Text(items[i],style:TextStyle(color:cs.onSurface))),
+            IconButton(
+              key:ValueKey('plugin-move-$i'),
+              tooltip:'上移'+items[i],
+              icon:const Icon(Icons.arrow_upward_rounded,size:19),
+              onPressed:i==0?null:()=>_moveUp(i)),
+          ])),
+        const Divider(height:16),
+        Row(children:[
+          Icon(Icons.keyboard_rounded,size:19,color:cs.primary),
+          const SizedBox(width:8),
+          Expanded(child:Text(bound?'快捷键 · Ctrl + K':'快捷键 · 未绑定',
+            style:TextStyle(fontSize:12,color:cs.onSurface))),
+          TextButton(
+            key:const ValueKey('plugin-demo-bind'),
+            onPressed:()=>setState(()=>bound=!bound),
+            child:Text(bound?'清除':'模拟绑定')),
+        ]),
+      ]),
+    );
   }
 }
