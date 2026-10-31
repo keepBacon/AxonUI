@@ -68,6 +68,23 @@ void main(){
     expect(find.byKey(const ValueKey('color-debug-preview')), findsNothing);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('Dark nested pages keep readable backgrounds and headers',
+    (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      theme:flTheme(brightness:Brightness.dark,seed:Colors.blue,glass:2),
+      home:Builder(builder:(context)=>Scaffold(body:Center(
+        child:FilledButton(
+          onPressed:()=>openPreviewFeatures(
+            context,'键鼠',PreviewCatalog.keyboard),
+          child:const Text('打开分类')))),
+    ));
+    await tester.tap(find.text('打开分类'));
+    await tester.pumpAndSettle();
+    expect(find.text('键鼠'),findsOneWidget);
+    expect(find.byType(FlShowcasePageSurface),findsOneWidget);
+    expect(tester.takeException(),isNull);
+  });
+
   testWidgets('Live miniature preview fits short panels and animates tabs',(tester)async{
     await tester.pumpWidget(const MaterialApp(
       home: Scaffold(body: SizedBox(

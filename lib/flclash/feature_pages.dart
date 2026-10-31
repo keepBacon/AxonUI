@@ -7,73 +7,61 @@ import 'animation_debug.dart';
 import 'material_debug.dart';
 import 'effect_debug.dart';
 import 'sequence_debug.dart';
+import 'showcase_components.dart';
 
 /// Top-level preview navigation: four tabs, no device or network backend.
 class FlPreviewHomeScreen extends StatelessWidget {
   const FlPreviewHomeScreen({super.key, required this.onSelect});
   final ValueChanged<int> onSelect;
+
   @override Widget build(BuildContext context) => ListView(
-    key: const PageStorageKey('preview-home'),
-    padding: const EdgeInsets.fromLTRB(24,18,24,140),
-    children: [
-      const Text('主页', style: TextStyle(
-        fontSize:29,fontWeight:FontWeight.w700)),
-      const SizedBox(height:10),
-      const FlSection(title:'展示目录',icon:Icons.grid_view_rounded),
-      FlGroup(children: [
-        FlSettingRow(title:'键显',
-          leading:const Icon(Icons.keyboard_alt_outlined),
-          trailing:const Icon(Icons.chevron_right_rounded),
-          onTap:()=>onSelect(1)),
-        FlSettingRow(title:'插件',
-          leading:const Icon(Icons.extension_outlined),
-          trailing:const Icon(Icons.chevron_right_rounded),
-          onTap:()=>onSelect(2)),
-        FlSettingRow(title:'其他',
-          leading:const Icon(Icons.tune_outlined),
-          trailing:const Icon(Icons.chevron_right_rounded),
-          onTap:()=>onSelect(3)),
+    key:const PageStorageKey('preview-home'),
+    padding:const EdgeInsets.fromLTRB(22,18,22,128),
+    children:[
+      const FlShowcaseHeader(title:'主页'),
+      const FlShowcaseSection(title:'组件目录',icon:Icons.grid_view_rounded),
+      FlGroup(radius:26,dividerInset:70,children:[
+        FlShowcaseEntry(title:'键显',icon:Icons.keyboard_alt_outlined,
+          subtitle:'键鼠 · 手柄 · 自定义',onTap:()=>onSelect(1),height:67),
+        FlShowcaseEntry(title:'插件',icon:Icons.extension_outlined,
+          subtitle:'插件配置与控件',onTap:()=>onSelect(2),height:67),
+        FlShowcaseEntry(title:'其他',icon:Icons.tune_outlined,
+          subtitle:'主题 · 外观 · 模型',onTap:()=>onSelect(3),height:67),
       ]),
-      const FlSection(title:'组件分类',icon:Icons.layers_outlined),
-      const FlPanel(child: Wrap(spacing:8,runSpacing:8,children: [
-        Chip(label:Text('键盘')),
-        Chip(label:Text('鼠标')),
-        Chip(label:Text('手柄')),
-        Chip(label:Text('自定义')),
-        Chip(label:Text('颜色')),
-        Chip(label:Text('动画')),
-        Chip(label:Text('材质')),
-        Chip(label:Text('插件')),
-      ])),
+      const FlShowcaseSection(title:'控件效果',icon:Icons.auto_awesome_motion_rounded),
+      const FlShowcaseInteractionPreview(),
     ],
   );
 }
 
 class FlKeyDisplayScreen extends StatelessWidget {
   const FlKeyDisplayScreen({super.key});
+
   @override Widget build(BuildContext context) => ListView(
     key:const PageStorageKey('keydisplay-list'),
-    padding:const EdgeInsets.fromLTRB(24,18,24,140),
-    children: [
-      const Text('键显',style:TextStyle(fontSize:29,fontWeight:FontWeight.w700)),
-      const FlSection(title:'分类',icon:Icons.widgets_outlined),
-      FlGroup(children: [
-        _entry(context,'键鼠',Icons.keyboard_alt_outlined,PreviewCatalog.keyboard),
-        _entry(context,'手柄',Icons.sports_esports_outlined,PreviewCatalog.gamepad),
-        _entry(context,'自定义',Icons.dashboard_customize_outlined,PreviewCatalog.custom),
+    padding:const EdgeInsets.fromLTRB(22,18,22,128),
+    children:[
+      const FlShowcaseHeader(title:'键显'),
+      const FlShowcaseSection(title:'分类',icon:Icons.widgets_outlined),
+      FlGroup(radius:26,dividerInset:72,children:[
+        _entry(context,'键鼠',Icons.keyboard_alt_outlined,
+          PreviewCatalog.keyboard,'键盘与鼠标'),
+        _entry(context,'手柄',Icons.sports_esports_outlined,
+          PreviewCatalog.gamepad,'按键与布局'),
+        _entry(context,'自定义',Icons.dashboard_customize_outlined,
+          PreviewCatalog.custom,'外观与动效'),
       ]),
+      const FlShowcaseSection(title:'交互预览',icon:Icons.tune_rounded),
+      const FlShowcaseInteractionPreview(),
     ],
   );
 
   Widget _entry(BuildContext context,String title,IconData icon,
-      List<PreviewGroup> groups) => FlSettingRow(
-    title:title,
-    leading:IconButton(
-      key:ValueKey('entry-arrow-$title'),
-      tooltip:'进入$title', icon:const Icon(Icons.chevron_right_rounded),
-      onPressed:()=>openPreviewFeatures(context,title,groups)),
-    trailing:Icon(icon,color:Theme.of(context).colorScheme.primary),
-    onTap:()=>openPreviewFeatures(context,title,groups));
+      List<PreviewGroup> groups,String subtitle) => FlShowcaseEntry(
+    title:title,icon:icon,subtitle:subtitle,height:72,
+    arrowKey:ValueKey('entry-arrow-$title'),
+    onTap:()=>openPreviewFeatures(context,title,groups),
+  );
 }
 
 class FlPluginShowcaseScreen extends StatelessWidget {
@@ -86,19 +74,16 @@ class FlOtherShowcaseScreen extends StatelessWidget {
   const FlOtherShowcaseScreen({super.key,required this.openTheme});
   final VoidCallback openTheme;
   @override Widget build(BuildContext context) => FlFeatureGroupsScreen(
-    title:'其他', groups:PreviewCatalog.others,isRoot:true,
-    leadingWidgets: [
-      const FlSection(title:'主题',icon:Icons.palette_outlined),
-      FlGroup(children:[
-        FlSettingRow(
-          title:'主题设置',
-          leading:IconButton(
-            key:const ValueKey('entry-arrow-theme'),
-            onPressed:openTheme,
-            icon:const Icon(Icons.chevron_right_rounded)),
+    title:'其他',groups:PreviewCatalog.others,isRoot:true,
+    leadingWidgets:[
+      const FlShowcaseSection(title:'主题',icon:Icons.palette_outlined),
+      FlGroup(radius:26,dividerInset:72,children:[
+        FlShowcaseEntry(title:'主题设置',icon:Icons.color_lens_outlined,
+          arrowKey:const ValueKey('entry-arrow-theme'),
           onTap:openTheme),
       ]),
-    ]);
+    ],
+  );
 }
 
 void openPreviewFeatures(BuildContext context,String title,List<PreviewGroup> groups) {
@@ -110,7 +95,8 @@ Route<void> _route(BuildContext context,Widget page) =>
   PageRouteBuilder<void>(
     transitionDuration:FlMotion.effective(context,FlMotion.page),
     reverseTransitionDuration:FlMotion.effective(context,FlMotion.release),
-    pageBuilder:(context,animation,secondary)=>page,
+    pageBuilder:(context,animation,secondary)=>
+      FlShowcasePageSurface(child:page),
     transitionsBuilder:(context,animation,secondary,child){
       final fade=CurvedAnimation(parent:animation,curve:Curves.easeOutCubic);
       return FadeTransition(opacity:fade,child:SlideTransition(
@@ -121,6 +107,7 @@ Route<void> _route(BuildContext context,Widget page) =>
   );
 
 /// Group screens contain only names and left-hand navigation arrows.
+/// Compact FlClash group screen; debug controls belong ONLY to detail pages.
 class FlFeatureGroupsScreen extends StatelessWidget {
   const FlFeatureGroupsScreen({super.key,required this.title,
     required this.groups,this.isRoot=false,this.leadingWidgets=const []});
@@ -132,31 +119,19 @@ class FlFeatureGroupsScreen extends StatelessWidget {
     backgroundColor:Colors.transparent,
     body:SafeArea(child:ListView(
       key:PageStorageKey('feature-groups-$title'),
-      padding:EdgeInsets.fromLTRB(24,isRoot?18:8,24,isRoot?140:38),
+      padding:EdgeInsets.fromLTRB(22,isRoot?18:7,22,isRoot?128:30),
       children:[
-        if(!isRoot) Row(children:[
-          IconButton(
-            key:const ValueKey('feature-back'),
-            onPressed:()=>Navigator.of(context).pop(),
-            icon:const Icon(Icons.arrow_back_rounded)),
-          const SizedBox(width:10),
-          Expanded(child:Text(title,style:const TextStyle(
-            fontSize:25,fontWeight:FontWeight.w700))),
-        ]) else
-          Text(title,style:const TextStyle(
-            fontSize:29,fontWeight:FontWeight.w700)),
+        FlShowcaseHeader(title:title,
+          onBack:isRoot?null:()=>Navigator.of(context).pop()),
         ...leadingWidgets,
         for(final group in groups)...[
-          FlSection(title:group.title,icon:group.icon),
-          FlGroup(children:[
+          FlShowcaseSection(title:group.title,icon:group.icon),
+          FlGroup(radius:26,dividerInset:72,children:[
             for(final feature in group.features)
-              FlSettingRow(
+              FlShowcaseEntry(
                 title:feature.title,
-                leading:IconButton(
-                  key:ValueKey('debug-arrow-${feature.title}'),
-                  tooltip:'打开${feature.title}',
-                  icon:const Icon(Icons.chevron_right_rounded),
-                  onPressed:()=>_openFeature(context,feature)),
+                height:60,
+                arrowKey:ValueKey('debug-arrow-${feature.title}'),
                 onTap:()=>_openFeature(context,feature),
               ),
           ]),
@@ -166,7 +141,8 @@ class FlFeatureGroupsScreen extends StatelessWidget {
   );
 
   void _openFeature(BuildContext context,PreviewFeature feature) {
-    Navigator.of(context).push(_route(context,FlFeatureDebugScreen(feature:feature)));
+    Navigator.of(context).push(
+      _route(context,FlFeatureDebugScreen(feature:feature)));
   }
 }
 
@@ -175,18 +151,21 @@ class FlFeatureDebugScreen extends StatelessWidget {
   const FlFeatureDebugScreen({super.key,required this.feature});
   final PreviewFeature feature;
   @override Widget build(BuildContext context) => Scaffold(
-    backgroundColor:Theme.of(context).scaffoldBackgroundColor,
+    backgroundColor:Colors.transparent,
     body:SafeArea(child:Column(children:[
-      Padding(padding:const EdgeInsets.fromLTRB(17,12,24,6),child:Row(children:[
-        IconButton(
-          key:const ValueKey('debug-back'),
-          icon:const Icon(Icons.arrow_back_rounded),
-          onPressed:()=>Navigator.of(context).pop()),
-        const SizedBox(width:9),
-        Expanded(child:Text(feature.title,maxLines:1,
-          overflow:TextOverflow.ellipsis,
-          style:const TextStyle(fontSize:23,fontWeight:FontWeight.w700))),
-      ])),
+      Padding(padding:const EdgeInsets.fromLTRB(17,12,20,6),
+        child:Row(children:[
+          IconButton(
+            key:const ValueKey('debug-back'),
+            icon:Icon(Icons.arrow_back_rounded,
+              color:Theme.of(context).colorScheme.onSurface),
+            onPressed:()=>Navigator.of(context).pop()),
+          const SizedBox(width:9),
+          Expanded(child:Text(feature.title,maxLines:1,
+            overflow:TextOverflow.ellipsis,
+            style:TextStyle(fontSize:23,fontWeight:FontWeight.w700,
+              color:Theme.of(context).colorScheme.onSurface))),
+        ])),
       Expanded(child:ListView(
         padding:const EdgeInsets.fromLTRB(24,8,24,38),
         children:[_panel(feature.kind,feature.title)],

@@ -24,9 +24,10 @@ class FlSection extends StatelessWidget {
 
 /// Rounded, nearly white grouped list, including subtle insets and separators.
 class FlGroup extends StatelessWidget {
-  const FlGroup({super.key, required this.children, this.radius = FlTokens.radius});
+  const FlGroup({super.key, required this.children,
+    this.radius = FlTokens.radius, this.dividerInset = 108});
   final List<Widget> children;
-  final double radius;
+  final double radius, dividerInset;
   @override
   Widget build(BuildContext context) => Material(
     color: flSurface(context),
@@ -35,7 +36,7 @@ class FlGroup extends StatelessWidget {
     child: Column(mainAxisSize: MainAxisSize.min, children: [
       for (var i = 0; i < children.length; i++) ...[
         if (i != 0) Padding(
-          padding: const EdgeInsets.only(left: 108, right: 20),
+          padding: EdgeInsets.only(left: dividerInset, right: 20),
           child: Divider(height: 1, thickness: .7,
             color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: .75))),
         children[i],
