@@ -44,3 +44,18 @@
 - 主页使用横向预览带、两列卡片与大面积交互卡形成不同尺寸的卡片节奏。
 - 增加交互测试，修复 FlPressScale 导入和 public barrel 导出缺失。
 - 本展示 APK 不等于 Axon-Input 的 UI 已被原地替换；仍需单独完成 Java/Flutter 宿主集成方案。
+
+## 2026-10-31 Axon 源码映射 UI 扩展
+
+映射源：keepBacon/Axon-Input 的 app/src/main/java/com/axon/input/，新增的控件仅为 Flutter UI。
+
+| 源码 | 新组件 | 对应 UI 状态 |
+|---|---|---|
+| GamepadSettingsStore.java | FlAxonGamepadStudio | 四种兼容模式、AB/XY/摇杆/扳机交换、自定义交换 |
+| TouchDisplayStore.java | FlAxonTouchStudio | 键鼠/手柄/触控模式、摇杆/LMB/RMB/空格四区域拖拽、尺寸 |
+| SuperCustomControlSpec.java + KeyAppearance.java | FlAxonCustomStudio | 按键/文本/摇杆、形状、颜色、宽度、透明度、圆角 |
+| FloatingMediaStore.java + FloatingVideoOverlayView.java | FlAxonMediaStudio | 多素材列表、循环/单次、色键抠像、透明度 |
+| FeatureShortcutStore.java | FlAxonShortcutStudio | 快捷键配置和冲突提示 |
+| SuperCustomConfigStore.java | FlAxonWorkspaceStudio | 5 个配置槽位、模拟保存/复制/清空 |
+
+源码位于 lib/flclash/axon_source_studios.dart；由 lib/flclash_ui.dart 导出。页面入口在主页、键显和其他分页。没有修改 Android 输入、无障碍、鼠标/手柄注入、视频播放或用户原始配置，所有数据为内存演示。

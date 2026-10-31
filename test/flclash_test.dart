@@ -3,6 +3,76 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:axon_flclash_flutter/flclash_ui.dart';
 
 void main(){
+  testWidgets('Axon gamepad swap and compatibility UI', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(child:FlAxonGamepadStudio()))));
+    await tester.pumpAndSettle();
+    expect(find.text('兼容模式与按键交换'),findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('axon-swap-A / B')));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(),isNull);
+  });
+
+  testWidgets('Axon touch regions drag in normalized canvas', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(child:FlAxonTouchStudio()))));
+    await tester.pumpAndSettle();
+    final before=tester.widget<Text>(
+      find.byKey(const ValueKey('axon-region-position'))).data;
+    await tester.drag(find.byKey(const ValueKey('axon-region-0')),
+      const Offset(36,17));
+    await tester.pumpAndSettle();
+    final after=tester.widget<Text>(
+      find.byKey(const ValueKey('axon-region-position'))).data;
+    expect(after,isNot(before));
+    expect(tester.takeException(),isNull);
+  });
+
+  testWidgets('Axon custom key text stick selector', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(child:FlAxonCustomStudio()))));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('文本'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('axon-custom-label')),findsOneWidget);
+    expect(tester.takeException(),isNull);
+  });
+
+  testWidgets('Axon media list and chroma editor', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(child:FlAxonMediaStudio()))));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('axon-media-add')));
+    await tester.pumpAndSettle();
+    expect(find.text('素材列表 · 3'),findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('axon-media-chroma')));
+    await tester.pumpAndSettle();
+    expect(find.text('抠像强度'),findsOneWidget);
+    expect(tester.takeException(),isNull);
+  });
+
+  testWidgets('Axon workspace state is locally editable', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(child:FlAxonWorkspaceStudio()))));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('axon-workspace-4')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('axon-workspace-save')));
+    await tester.pumpAndSettle();
+    expect(find.text('槽位 5 · 已保存演示'),findsOneWidget);
+    expect(tester.takeException(),isNull);
+  });
+
+  testWidgets('Axon shortcut matrix exposes mock bindings', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(child:FlAxonShortcutStudio()))));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('axon-binding-常规按显')),findsOneWidget);
+    expect(find.text('UI 模拟，不会注册或触发按键'),findsOneWidget);
+    expect(tester.takeException(),isNull);
+  });
+
+
   testWidgets('Showcase mixed cards keep navigation and local state',
     (tester) async {
     await tester.pumpWidget(FlClashAxonApp(store:FlMemoryStore()));

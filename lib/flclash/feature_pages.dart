@@ -10,6 +10,7 @@ import 'sequence_debug.dart';
 import 'showcase_components.dart';
 import 'source_feature_stage.dart';
 import 'showcase_mosaic.dart';
+import 'axon_source_studios.dart';
 
 /// Top-level preview navigation: four tabs, no device or network backend.
 class FlPreviewHomeScreen extends StatelessWidget {
@@ -59,6 +60,13 @@ class FlPreviewHomeScreen extends StatelessWidget {
         const FlShowcasePreviewRibbon(),
         const SizedBox(height:12),
         const FlShowcaseInteractionPreview(),
+        const FlShowcaseSection(title:'Axon 源码实验室',icon:Icons.science_outlined),
+        FlShowcaseSpecimenGrid(children:[
+          FlShowcaseSpecimenTile(title:'手柄映射',kind:'gamepad',caption:'兼容与交换',onTap:()=>openAxonStudio(context,AxonStudioKind.gamepad)),
+          FlShowcaseSpecimenTile(title:'触控区域',kind:'keys',caption:'拖拽布局',onTap:()=>openAxonStudio(context,AxonStudioKind.touch)),
+          FlShowcaseSpecimenTile(title:'自定义控件',kind:'color',caption:'外观参数',onTap:()=>openAxonStudio(context,AxonStudioKind.custom)),
+          FlShowcaseSpecimenTile(title:'悬浮媒体',kind:'glass',caption:'多素材视觉',onTap:()=>openAxonStudio(context,AxonStudioKind.media)),
+        ]),
       ],
     );
   }
@@ -101,6 +109,12 @@ class FlKeyDisplayScreen extends StatelessWidget {
       ]),
       const FlShowcaseSection(title:'实时演示',icon:Icons.keyboard_alt_outlined),
       const FlKeyboardShowcaseSample(),
+      const FlShowcaseSection(title:'Axon 源码控件',icon:Icons.dashboard_customize_outlined),
+      FlGroup(children:[
+        FlShowcaseEntry(title:'手柄映射编辑器',subtitle:'兼容模式与按键交换',icon:Icons.sports_esports_outlined,onTap:()=>openAxonStudio(context,AxonStudioKind.gamepad)),
+        FlShowcaseEntry(title:'触控区域编辑器',subtitle:'四区域拖拽布局',icon:Icons.touch_app_outlined,onTap:()=>openAxonStudio(context,AxonStudioKind.touch)),
+        FlShowcaseEntry(title:'超级自定义控件',subtitle:'按键、文本与摇杆',icon:Icons.dashboard_customize_outlined,onTap:()=>openAxonStudio(context,AxonStudioKind.custom)),
+      ]),
     ],
   );
 
@@ -161,8 +175,42 @@ class FlOtherShowcaseScreen extends StatelessWidget {
           title:'材质预览',kind:'glass',
           caption:'表面与模糊'),
       ]),
+      const FlShowcaseSection(title:'Axon 源码扩展',icon:Icons.extension_outlined),
+      FlGroup(children:[
+        FlShowcaseEntry(title:'悬浮媒体编辑器',subtitle:'素材、循环与抠像',icon:Icons.movie_filter_outlined,onTap:()=>openAxonStudio(context,AxonStudioKind.media)),
+        FlShowcaseEntry(title:'快捷键绑定矩阵',subtitle:'键鼠手柄与冲突提示',icon:Icons.keyboard_outlined,onTap:()=>openAxonStudio(context,AxonStudioKind.shortcuts)),
+        FlShowcaseEntry(title:'五槽位工作区',subtitle:'保存、清空及复制演示',icon:Icons.layers_outlined,onTap:()=>openAxonStudio(context,AxonStudioKind.workspace)),
+      ]),
     ],
   );
+}
+
+void openAxonStudio(BuildContext context,AxonStudioKind kind) {
+  Navigator.of(context).push(_route(context,FlAxonStudioScreen(kind:kind)));
+}
+
+class FlAxonStudioScreen extends StatelessWidget {
+  const FlAxonStudioScreen({super.key,required this.kind});
+  final AxonStudioKind kind;
+  @override Widget build(BuildContext context) {
+    final title=switch(kind){
+      AxonStudioKind.gamepad=>'手柄兼容与映射',
+      AxonStudioKind.touch=>'触控区域布局',
+      AxonStudioKind.custom=>'超级自定义控件',
+      AxonStudioKind.media=>'悬浮媒体',
+      AxonStudioKind.shortcuts=>'快捷键绑定',
+      AxonStudioKind.workspace=>'工作区槽位',
+    };
+    return Scaffold(backgroundColor:Colors.transparent,
+      body:SafeArea(child:ListView(
+        padding:const EdgeInsets.fromLTRB(22,12,22,45),
+        children:[
+          FlShowcaseHeader(title:title,onBack:()=>Navigator.of(context).pop()),
+          const SizedBox(height:8),
+          FlAxonSourceStudio(kind:kind),
+        ],
+      )));
+  }
 }
 
 void openPreviewFeature(BuildContext context,PreviewFeature feature) {
