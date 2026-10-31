@@ -3,6 +3,44 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:axon_flclash_flutter/flclash_ui.dart';
 
 void main(){
+  testWidgets('Keyboard cat function binding and preview modes', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(child:FlKeyboardCatDebugStudio()))));
+    await tester.pumpAndSettle();
+    expect(find.text('模型功能与快捷键'),findsOneWidget);
+    final action=find.byKey(const ValueKey('cat-action-preview-param:Param3'));
+    await tester.ensureVisible(action);
+    await tester.tap(action);
+    await tester.pumpAndSettle();
+    expect(find.text('触发 1 次'),findsOneWidget);
+    expect(tester.takeException(),isNull);
+  });
+  testWidgets('Keyboard cat parameter locks and search', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(
+        child:FlKeyboardCatDebugStudio(initialSection:1)))));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const ValueKey('cat-param-search')),'Param3');
+    await tester.pumpAndSettle();
+    expect(find.text('挥手'),findsOneWidget);
+    final lock=find.byKey(const ValueKey('cat-param-lock-Param3'));
+    await tester.ensureVisible(lock);
+    await tester.tap(lock);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(),isNull);
+  });
+  testWidgets('Keyboard cat expressions and physics panels', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(
+        child:FlKeyboardCatDebugStudio(initialSection:2)))));
+    await tester.pumpAndSettle();
+    expect(find.text('表情与动作权重'),findsOneWidget);
+    await tester.tap(find.text('物理').last);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('cat-physics-global')),findsOneWidget);
+    expect(tester.takeException(),isNull);
+  });
+
   testWidgets('Axon gamepad swap and compatibility UI', (tester) async {
     await tester.pumpWidget(const MaterialApp(home:Scaffold(
       body:SingleChildScrollView(child:FlAxonGamepadStudio()))));

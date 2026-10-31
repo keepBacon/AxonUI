@@ -9,6 +9,7 @@ export 'flclash/advanced_controls.dart';
 export 'flclash/feature_catalog.dart';
 export 'flclash/feature_pages.dart';
 export 'flclash/axon_source_studios.dart';
+export 'flclash/keyboard_cat_debug.dart';
 export 'flclash/showcase_mosaic.dart';
 export 'flclash/showcase_components.dart';
 export 'flclash/color_debug.dart';

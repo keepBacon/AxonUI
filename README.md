@@ -22,3 +22,7 @@ GPL-3.0。第三方版权及许可声明保留在原始源文件和授权文档�
 ## Axon 原生源码 UI 控件扩展
 
 基于 Axon-Input 真实 Java 声明新增六组可独立复用的 UI-only 控件：手柄兼容/交换、触控区域拖拽、超级自定义控件、悬浮媒体、快捷键绑定、五槽位工作区。所有交互只更新 Flutter 本地状态，无设备输入、视频播放或原生配置写入。键显与其他分页增加了入口，主页增加精选预览卡。
+
+## 键盘猫模型功能与参数调试（仅 UI）
+
+新增 `FlKeyboardCatDebugStudio`：功能动作列表、触发方式（hold/toggle/pulse/sequence）、本地快捷键绑定、CDI3 参数搜索与锁定、表情权重、Physics 全局/分组强度、分组热键。样本参数来自 Axon-Input 的 `bongocat/keyboard/demomodel2.cdi3.json`，表情和动作列表来自样本 `cat.model3.json`。演示 Physics 组不是该样本模型的真实组，不渲染或载入任何模型文件，也不触发实际设备事件。入口位于键显和功能详情。

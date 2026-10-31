@@ -32,7 +32,7 @@ abstract final class PreviewCatalog {
     _g('键盘与鼠标',Icons.keyboard_outlined,
       '常规按显|source;输入时显示全键盘|source;鼠标按显|source;键盘猫显示|source;最近按键|source;鼠标轨迹|source;自定义鼠标指针|source'),
     _g('外观调试',Icons.palette_outlined,
-      '颜色调试|color;透明度调试|layers;按压动画调试|press;键位间距|spacing'),
+      '颜色调试|color;透明度调试|layers;按压动画调试|press;键位间距|spacing;键盘猫模型调试|source'),
   ];
   static final gamepad=<PreviewGroup>[
     _g('游戏手柄',Icons.sports_esports_outlined,
@@ -62,7 +62,7 @@ abstract final class PreviewCatalog {
     _g('输入增强 · 参数展示',Icons.tune_outlined,
       '灵敏度倍率|source;同时点击|source;强制长按|source'),
     _g('模型与插件显示',Icons.view_in_ar_outlined,
-      'Live2D|source;Web 插件显示|source'),
+      'Live2D|source;Live2D 模型调试|source;Web 插件显示|source'),
     _g('外观',Icons.palette_outlined,
       '颜色调试|color;动画调试|animation;材质调试|material;文字效果调试|textEffects'),
   ];

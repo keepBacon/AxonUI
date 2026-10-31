@@ -11,6 +11,7 @@ import 'showcase_components.dart';
 import 'source_feature_stage.dart';
 import 'showcase_mosaic.dart';
 import 'axon_source_studios.dart';
+import 'keyboard_cat_debug.dart';
 
 /// Top-level preview navigation: four tabs, no device or network backend.
 class FlPreviewHomeScreen extends StatelessWidget {
@@ -109,6 +110,8 @@ class FlKeyDisplayScreen extends StatelessWidget {
       ]),
       const FlShowcaseSection(title:'实时演示',icon:Icons.keyboard_alt_outlined),
       const FlKeyboardShowcaseSample(),
+      const FlShowcaseSection(title:'键盘猫模型调试',icon:Icons.pets_outlined),
+      FlGroup(children:[FlShowcaseEntry(title:'模型功能与参数',subtitle:'功能绑定、Cubism 参数、表情与 Physics',icon:Icons.tune_rounded,onTap:()=>openPreviewFeature(context,const PreviewFeature('键盘猫模型调试',PreviewKind.source)))]),
       const FlShowcaseSection(title:'Axon 源码控件',icon:Icons.dashboard_customize_outlined),
       FlGroup(children:[
         FlShowcaseEntry(title:'手柄映射编辑器',subtitle:'兼容模式与按键交换',icon:Icons.sports_esports_outlined,onTap:()=>openAxonStudio(context,AxonStudioKind.gamepad)),
@@ -326,7 +329,7 @@ class FlFeatureDebugScreen extends StatelessWidget {
     PreviewKind.layout=>const FlSpacingDebug(),
     PreviewKind.media=>_LocalMediaSample(title:title),
     PreviewKind.plugin=>_LocalSettingsSample(title:title),
-    PreviewKind.source=>FlSourceFeatureSample(title:title),
+    PreviewKind.source=>title=='键盘猫显示'||title=='键盘猫模型调试'||title=='Live2D 模型调试' ? const FlKeyboardCatDebugStudio() : FlSourceFeatureSample(title:title),
   };
 }
 
