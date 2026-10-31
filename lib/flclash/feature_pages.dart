@@ -9,38 +9,63 @@ import 'effect_debug.dart';
 import 'sequence_debug.dart';
 import 'showcase_components.dart';
 import 'source_feature_stage.dart';
+import 'showcase_mosaic.dart';
 
 /// Top-level preview navigation: four tabs, no device or network backend.
 class FlPreviewHomeScreen extends StatelessWidget {
   const FlPreviewHomeScreen({super.key, required this.onSelect});
   final ValueChanged<int> onSelect;
-
-  @override Widget build(BuildContext context) => ListView(
-    key:const PageStorageKey('preview-home'),
-    padding:const EdgeInsets.fromLTRB(22,18,22,128),
-    children:[
-      const FlShowcaseHeader(title:'主页'),
-      const FlShowcaseSection(title:'组件目录',icon:Icons.grid_view_rounded),
-      FlGroup(radius:26,dividerInset:70,children:[
-        FlShowcaseEntry(title:'键显',icon:Icons.keyboard_alt_outlined,
-          subtitle:'键鼠 · 手柄 · 自定义',onTap:()=>onSelect(1),height:67),
-        FlShowcaseEntry(title:'插件',icon:Icons.extension_outlined,
-          subtitle:'插件配置与控件',onTap:()=>onSelect(2),height:67),
-        FlShowcaseEntry(title:'其他',icon:Icons.tune_outlined,
-          subtitle:'主题 · 外观 · 模型',onTap:()=>onSelect(3),height:67),
-      ]),
-      const FlShowcaseSection(title:'控件效果',icon:Icons.auto_awesome_motion_rounded),
-      const FlShowcaseInteractionPreview(),
-    ],
-  );
+  @override Widget build(BuildContext context) {
+    final featureCount=[
+      ...PreviewCatalog.keyboard,...PreviewCatalog.gamepad,
+      ...PreviewCatalog.custom,...PreviewCatalog.plugins,
+      ...PreviewCatalog.others,
+    ].fold<int>(0,(total,group)=>total+group.features.length);
+    return ListView(
+      key:const PageStorageKey('preview-home'),
+      padding:const EdgeInsets.fromLTRB(22,16,22,132),
+      children:[
+        const FlShowcaseHeader(title:'主页'),
+        const SizedBox(height:15),
+        FlShowcaseHero(features:featureCount),
+        const FlShowcaseSection(title:'分类',icon:Icons.grid_view_outlined),
+        SizedBox(height:104,child:FlShowcaseCategoryTile(
+          title:'键显',detail:'键鼠 · 手柄 · 自定义',
+          icon:Icons.keyboard_alt_outlined,
+          highlight:true,onTap:()=>onSelect(1))),
+        const SizedBox(height:10),
+        SizedBox(height:140,child:Row(children:[
+          Expanded(child:FlShowcaseCategoryTile(
+            title:'插件',detail:'配置组件',
+            icon:Icons.extension_outlined,onTap:()=>onSelect(2))),
+          const SizedBox(width:10),
+          Expanded(child:FlShowcaseCategoryTile(
+            title:'其他',detail:'外观与材质',
+            icon:Icons.tune_rounded,onTap:()=>onSelect(3))),
+        ])),
+        const FlShowcaseSection(title:'控件精选',icon:Icons.view_quilt_outlined),
+        const FlShowcaseSpecimenGrid(children:[
+          FlShowcaseSpecimenTile(title:'键盘外观',kind:'keys',
+            caption:'按键状态'),
+          FlShowcaseSpecimenTile(title:'颜色样式',kind:'color',
+            caption:'多色调试'),
+          FlShowcaseSpecimenTile(title:'滑块',kind:'slider',
+            caption:'数值调整'),
+          FlShowcaseSpecimenTile(title:'玻璃材质',kind:'glass',
+            caption:'表面效果'),
+        ]),
+        const FlShowcaseSection(title:'交互动效',icon:Icons.animation_outlined),
+        const FlShowcaseInteractionPreview(),
+      ],
+    );
+  }
 }
 
 class FlKeyDisplayScreen extends StatelessWidget {
   const FlKeyDisplayScreen({super.key});
-
   @override Widget build(BuildContext context) => ListView(
     key:const PageStorageKey('keydisplay-list'),
-    padding:const EdgeInsets.fromLTRB(22,18,22,128),
+    padding:const EdgeInsets.fromLTRB(22,16,22,132),
     children:[
       const FlShowcaseHeader(title:'键显'),
       const FlShowcaseSection(title:'分类',icon:Icons.widgets_outlined),
@@ -52,21 +77,52 @@ class FlKeyDisplayScreen extends StatelessWidget {
         _entry(context,'自定义',Icons.dashboard_customize_outlined,
           PreviewCatalog.custom,'外观与动效'),
       ]),
-     ],
+      const FlShowcaseSection(title:'功能精选',icon:Icons.auto_awesome_outlined),
+      FlShowcaseSpecimenGrid(children:[
+        FlShowcaseSpecimenTile(
+          title:'常规按显',kind:'keys',caption:'键盘外观',
+          onTap:()=>openPreviewFeature(context,
+            PreviewCatalog.keyboard.first.features.first)),
+        FlShowcaseSpecimenTile(
+          title:'ABXY 按键',kind:'gamepad',caption:'手柄按键',
+          onTap:()=>openPreviewFeature(context,
+            PreviewCatalog.gamepad.first.features[2])),
+        FlShowcaseSpecimenTile(
+          title:'颜色调试',kind:'color',caption:'外观参数',
+          onTap:()=>openPreviewFeature(context,
+            PreviewCatalog.custom[1].features.first)),
+        FlShowcaseSpecimenTile(
+          title:'按压动画',kind:'motion',caption:'过渡与反馈',
+          onTap:()=>openPreviewFeature(context,
+            PreviewCatalog.custom[2].features.first)),
+      ]),
+      const FlShowcaseSection(title:'样式预览',icon:Icons.keyboard_alt_outlined),
+      const FlKeyboardShowcaseSample(),
+    ],
   );
 
   Widget _entry(BuildContext context,String title,IconData icon,
       List<PreviewGroup> groups,String subtitle) => FlShowcaseEntry(
     title:title,icon:icon,subtitle:subtitle,height:72,
     arrowKey:ValueKey('entry-arrow-$title'),
-    onTap:()=>openPreviewFeatures(context,title,groups),
-  );
+    onTap:()=>openPreviewFeatures(context,title,groups));
 }
 
 class FlPluginShowcaseScreen extends StatelessWidget {
   const FlPluginShowcaseScreen({super.key});
   @override Widget build(BuildContext context)=>FlFeatureGroupsScreen(
-    title:'插件',groups:PreviewCatalog.plugins,isRoot:true);
+    title:'插件',groups:PreviewCatalog.plugins,isRoot:true,
+    leadingWidgets:const [
+      FlShowcaseSection(title:'组件操作台',icon:Icons.widgets_outlined),
+      FlPluginWorkbench(),
+      FlShowcaseSection(title:'控件类型',icon:Icons.view_quilt_outlined),
+      FlShowcaseSpecimenGrid(children:[
+        FlShowcaseSpecimenTile(title:'开关',kind:'switch'),
+        FlShowcaseSpecimenTile(title:'数值',kind:'slider'),
+        FlShowcaseSpecimenTile(title:'颜色',kind:'color'),
+        FlShowcaseSpecimenTile(title:'文字',kind:'text'),
+      ]),
+    ]);
 }
 
 class FlOtherShowcaseScreen extends StatelessWidget {
@@ -81,8 +137,23 @@ class FlOtherShowcaseScreen extends StatelessWidget {
           arrowKey:const ValueKey('entry-arrow-theme'),
           onTap:openTheme),
       ]),
+      const FlShowcaseSection(title:'材质与颜色',icon:Icons.palette_outlined),
+      FlShowcaseSpecimenGrid(children:[
+        FlShowcaseSpecimenTile(
+          title:'颜色调试',kind:'color',
+          caption:'色板与透明度',
+          onTap:null),
+        FlShowcaseSpecimenTile(
+          title:'材质预览',kind:'glass',
+          caption:'表面与模糊'),
+      ]),
     ],
   );
+}
+
+void openPreviewFeature(BuildContext context,PreviewFeature feature) {
+  Navigator.of(context).push(_route(context,
+    FlFeatureDebugScreen(feature:feature)));
 }
 
 void openPreviewFeatures(BuildContext context,String title,List<PreviewGroup> groups) {

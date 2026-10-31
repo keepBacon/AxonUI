@@ -3,6 +3,37 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:axon_flclash_flutter/flclash_ui.dart';
 
 void main(){
+  testWidgets('Showcase mixed cards keep navigation and local state',
+    (tester) async {
+    await tester.pumpWidget(FlClashAxonApp(store:FlMemoryStore()));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('showcase-hero')),findsOneWidget);
+    expect(find.byKey(const ValueKey('showcase-category-键显')),findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('showcase-category-键显')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('entry-arrow-键鼠')),findsOneWidget);
+    expect(find.byKey(const ValueKey('entry-arrow-手柄')),findsOneWidget);
+    expect(find.byKey(const ValueKey('entry-arrow-自定义')),findsOneWidget);
+    expect(find.byKey(const ValueKey('color-debug-preview')),findsNothing);
+    expect(tester.takeException(),isNull);
+  });
+
+  testWidgets('Plugin workbench changes preview-only fields',
+    (tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(child:FlPluginWorkbench()))));
+    await tester.pumpAndSettle();
+    final toggle=find.byKey(const ValueKey('plugin-demo-switch'));
+    expect(tester.widget<Switch>(toggle).value,isTrue);
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+    expect(tester.widget<Switch>(toggle).value,isFalse);
+    final slider=find.byKey(const ValueKey('plugin-demo-slider'));
+    await tester.drag(slider,const Offset(80,0));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(),isNull);
+  });
+
   testWidgets('Four navigation tabs are present',(tester)async{
     await tester.pumpWidget(FlClashAxonApp(store:FlMemoryStore()));
     await tester.pumpAndSettle();
