@@ -8,6 +8,7 @@ import 'material_debug.dart';
 import 'effect_debug.dart';
 import 'sequence_debug.dart';
 import 'showcase_components.dart';
+import 'source_feature_stage.dart';
 
 /// Top-level preview navigation: four tabs, no device or network backend.
 class FlPreviewHomeScreen extends StatelessWidget {
@@ -123,12 +124,14 @@ class FlFeatureGroupsScreen extends StatelessWidget {
           onBack:isRoot?null:()=>Navigator.of(context).pop()),
         ...leadingWidgets,
         for(final group in groups)...[
-          FlShowcaseSection(title:group.title,icon:group.icon),
-          FlGroup(radius:26,dividerInset:72,children:[
+          FlShowcaseGroupHeading(
+            title:group.title,icon:group.icon,count:group.features.length),
+          FlGroup(radius:24,dividerInset:71,children:[
             for(final feature in group.features)
               FlShowcaseEntry(
                 title:feature.title,
-                height:60,
+                height:64,
+                visual:FlFeatureThumbnail(kind:feature.kind,title:feature.title),
                 arrowKey:ValueKey('debug-arrow-${feature.title}'),
                 onTap:()=>_openFeature(context,feature),
               ),
@@ -356,77 +359,165 @@ class _FlSourceFeatureSampleState extends State<FlSourceFeatureSample> {
     '同时点击':['组合列表'],
     '隐藏按显快捷键':['快捷键外观','目标选择'],
   };
-  bool _isToggle(String x)=>x.startsWith('显示')||x.startsWith('交换')||
-    x.contains('启用')||x.contains('反转')||x.contains('图标')||
-    x.contains('捕捉')||x.contains('去水印')||x.contains('诊断模式');
+  bool _isToggle(String x)=>x.startsWith('显示')||
+    x.startsWith('交换')||x.contains('启用')||x.contains('反转')||
+    x.contains('图标')||x.contains('捕捉')||x.contains('去水印')||
+    x.contains('诊断模式')||x.contains('显示为横杠')||
+    x.contains('左右键显示')||x.contains('方向键变为鼠标')||
+    x.contains('全局反转')||x.contains('位置交换')||
+    x.contains('文字描边')||x.contains('文字阴影')||
+    x.contains('全套动作捕捉')||x.contains('模拟开关');
   bool _isSelection(String x)=>x.contains('模式')||x.contains('类型')||
     x.contains('风格')||x.contains('选择')||x.contains('组')||
     x.contains('左摇杆 /');
   @override Widget build(BuildContext context) {
     final params=specs[widget.title]??const <String>[];
     final cs=Theme.of(context).colorScheme;
+    final sourceLevel=values['键盘大小']??values['按键大小']??
+      values['摇杆大小']??values['模型大小']??50;
     return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
-      FlGroup(children:[FlToggleRow(
-        key:const ValueKey('source-feature-toggle'),
-        title:widget.title,icon:Icons.tune_rounded,value:enabled,
-        onChanged:(v)=>setState(()=>enabled=v))]),
-      const SizedBox(height:14),
-      if(params.isNotEmpty) FlPanel(child:Column(
-        crossAxisAlignment:CrossAxisAlignment.stretch,children:[
-          for(final param in params)...[
-            if(param.contains('颜色调试')||param.contains('背景颜色')||
-                param.contains('文字颜色')||param.contains('边框颜色')||
-                param.contains('按下颜色'))
+      FlGroup(dividerInset:64,children:[
+        FlToggleRow(
+          key:const ValueKey('source-feature-toggle'),
+          title:widget.title,icon:Icons.tune_rounded,value:enabled,
+          onChanged:(v)=>setState(()=>enabled=v)),
+      ]),
+      const SizedBox(height:13),
+      FlSourceFeatureStage(
+        title:widget.title,enabled:enabled,level:sourceLevel/100),
+      const SizedBox(height:20),
+      Row(children:[
+        Icon(Icons.tune_rounded,color:cs.primary,size:20),
+        const SizedBox(width:9),
+        Text('参数调试',style:TextStyle(
+          fontSize:16,fontWeight:FontWeight.w700,
+          color:cs.onSurface)),
+        const Spacer(),
+        Text('${params.length} 项',style:TextStyle(
+          fontSize:12,color:cs.onSurfaceVariant)),
+      ]),
+      const SizedBox(height:10),
+      if(params.isNotEmpty) FlPanel(
+        padding:const EdgeInsets.symmetric(horizontal:17,vertical:10),
+        child:Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
+          for(final (index,param) in params.indexed)...[
+            if(index>0) Divider(
+              height:18,thickness:.65,
+              color:cs.outlineVariant.withValues(alpha:.6)),
+            if(param.contains('调试'))
+              _debugLink(context,param)
+            else if(param.contains('背景颜色')||
+                    param.contains('文字颜色')||
+                    param.contains('边框颜色')||
+                    param.contains('按下颜色')||
+                    param.contains('键盘颜色'))
               _colorRow(param,cs)
             else if(_isToggle(param))
               SwitchListTile.adaptive(
-                contentPadding:EdgeInsets.zero,title:Text(param),
+                key:ValueKey('source-toggle-$param'),
+                contentPadding:EdgeInsets.zero,
+                dense:true,title:Text(param,
+                  style:const TextStyle(fontSize:14)),
                 value:switches[param]??false,
                 onChanged:(v)=>setState(()=>switches[param]=v))
             else if(_isSelection(param))
               _selectRow(param)
             else _sliderRow(param),
-            const SizedBox(height:6),
           ],
+        ]),
+      ),
+      if(params.isEmpty) FlPanel(child:Column(
+        crossAxisAlignment:CrossAxisAlignment.stretch,children:[
+          Text(widget.title,style:const TextStyle(fontSize:16)),
+          const SizedBox(height:14),
+          FlSegmented<String>(
+            values:const ['默认','选项一','选项二'],
+            label:(x)=>x,
+            value:['默认','选项一','选项二'][options['generic']??0],
+            onChanged:(x)=>setState(()=>options['generic']=
+              ['默认','选项一','选项二'].indexOf(x))),
         ])),
-      if(params.isEmpty) FlPanel(child:Column(children:[
-        Text(widget.title,style:const TextStyle(fontSize:17)),
-        const SizedBox(height:12),
-        FlSegmented<String>(values:const ['默认','选项一','选项二'],
-          label:(x)=>x,value:['默认','选项一','选项二'][
-            options['generic']??0],
-          onChanged:(x)=>setState(()=>options['generic']=
-            ['默认','选项一','选项二'].indexOf(x))),
-      ])),
     ]);
   }
+
+  Widget _debugLink(BuildContext context,String param) {
+    final cs=Theme.of(context).colorScheme;
+    final kind=param.contains('动画') ? PreviewKind.press :
+      param.contains('透明度') ? PreviewKind.material :
+      PreviewKind.color;
+    return InkWell(
+      key:ValueKey('source-debug-link-$param'),
+      borderRadius:BorderRadius.circular(12),
+      onTap:()=>Navigator.of(context).push(
+        _route(context,FlFeatureDebugScreen(
+          feature:PreviewFeature(param,kind)))),
+      child:Padding(
+        padding:const EdgeInsets.symmetric(vertical:7),
+        child:Row(children:[
+          Icon(Icons.chevron_right_rounded,size:24,
+            color:cs.primary),
+          const SizedBox(width:9),
+          Expanded(child:Text(param,
+            style:const TextStyle(fontSize:14,
+              fontWeight:FontWeight.w600))),
+          Icon(Icons.tune_rounded,size:18,
+            color:cs.onSurfaceVariant),
+        ]),
+      ),
+    );
+  }
+
   Widget _sliderRow(String name) {
     final value=values[name]??50;
-    return Column(children:[
-      Row(children:[Expanded(child:Text(name)),
-        Text('${value.round()}',style:const TextStyle(fontSize:12))]),
-      Slider(value:value,min:0,max:100,
-        onChanged:(x)=>setState(()=>values[name]=x)),
-    ]);
+    return Padding(padding:const EdgeInsets.symmetric(vertical:4),
+      child:Column(children:[
+        Row(children:[
+          Expanded(child:Text(name,style:const TextStyle(fontSize:14))),
+          Container(
+            padding:const EdgeInsets.symmetric(horizontal:9,vertical:5),
+            decoration:BoxDecoration(
+              color:Theme.of(context).colorScheme.surfaceContainerHighest
+                .withValues(alpha:.6),
+              borderRadius:BorderRadius.circular(12)),
+            child:Text('${value.round()}',
+              style:const TextStyle(fontSize:12,
+                fontWeight:FontWeight.w600)),
+          ),
+        ]),
+        Slider(
+          key:ValueKey('source-slider-$name'),
+          value:value,min:0,max:100,
+          onChanged:(x)=>setState(()=>values[name]=x)),
+      ]),
+    );
   }
   Widget _selectRow(String name) {
     const choices=['自动','标准','自定义'];
     return Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-      Text(name),const SizedBox(height:8),
+      Text(name,style:const TextStyle(fontSize:14)),
+      const SizedBox(height:10),
       FlSegmented<String>(values:choices,label:(s)=>s,
         value:choices[options[name]??0],
         onChanged:(v)=>setState(()=>options[name]=choices.indexOf(v))),
     ]);
   }
   Widget _colorRow(String name,ColorScheme cs)=>Padding(
-    padding:const EdgeInsets.symmetric(vertical:6),
+    padding:const EdgeInsets.symmetric(vertical:7),
     child:Row(children:[
-      Expanded(child:Text(name)),
+      Expanded(child:Text(name,style:const TextStyle(fontSize:14))),
       for(final c in [cs.primary,cs.tertiary,cs.secondary]) Padding(
-        padding:const EdgeInsets.only(left:8),
+        padding:const EdgeInsets.only(left:9),
         child:InkWell(
+          key:ValueKey('source-swatch-$name-${c.toARGB32()}'),
           onTap:()=>setState(()=>options[name]=c.toARGB32()),
-          child:CircleAvatar(radius:15,backgroundColor:c))),
+          child:AnimatedContainer(
+            duration:FlMotion.effective(context,FlMotion.short),
+            padding:const EdgeInsets.all(3),
+            decoration:BoxDecoration(shape:BoxShape.circle,
+              border:Border.all(
+                color:options[name]==c.toARGB32()
+                  ? cs.primary:Colors.transparent,width:2)),
+            child:CircleAvatar(radius:12,backgroundColor:c)))),
     ]),
   );
 }
