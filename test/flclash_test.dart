@@ -49,7 +49,22 @@ void main(){
     expect(find.byKey(const ValueKey('color-debug-preview')), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('debug-back')));
     await tester.pumpAndSettle();
-    expect(find.text('颜色与材质'), findsOneWidget);
+    // The list retains its scroll offset. Its section heading may be
+    // lazily unmounted once the target row has scrolled past the heading.
+    expect(find.byType(FlFeatureGroupsScreen), findsOneWidget);
+    expect(find.byType(FlFeatureDebugScreen), findsNothing);
+    final restoredList = find.descendant(
+      of: find.byType(FlFeatureGroupsScreen),
+      matching: find.byType(Scrollable),
+    );
+    expect(restoredList, findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('debug-arrow-颜色调试')),
+      120,
+      scrollable: restoredList,
+    );
+    expect(find.byKey(const ValueKey('debug-arrow-颜色调试')),
+      findsOneWidget);
     expect(find.byKey(const ValueKey('color-debug-preview')), findsNothing);
     expect(tester.takeException(), isNull);
   });
