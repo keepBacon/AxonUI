@@ -3,6 +3,25 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:axon_flclash_flutter/flclash_ui.dart';
 
 void main(){
+  testWidgets('Keyboard cat clear filters resets visible search input',
+    (tester) async {
+    await tester.pumpWidget(const MaterialApp(home:Scaffold(
+      body:SingleChildScrollView(
+        child:FlKeyboardCatDebugStudio(initialSection:1)))));
+    await tester.pumpAndSettle();
+    final search=find.byKey(const ValueKey('cat-param-search'));
+    await tester.enterText(search,'Param3');
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(search).controller?.text,'Param3');
+    final clear=find.byKey(const ValueKey('cat-clear-filters'));
+    await tester.ensureVisible(clear);
+    await tester.tap(clear);
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(search).controller?.text,'');
+    expect(find.text('匹配 34 项'),findsOneWidget);
+    expect(tester.takeException(),isNull);
+  });
+
   testWidgets('Keyboard cat full sample categories and filter controls',
     (tester) async {
     await tester.pumpWidget(const MaterialApp(home:Scaffold(

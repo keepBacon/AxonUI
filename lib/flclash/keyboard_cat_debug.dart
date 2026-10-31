@@ -34,6 +34,7 @@ class _FlKeyboardCatDebugStudioState extends State<FlKeyboardCatDebugStudio> {
   String parameterCategory='全部',actionCategory='全部';
   bool modifiedOnly=false,lockedOnly=false;
   String? bindingNotice;
+  late final TextEditingController _parameterSearch;
   // These are real ids and names from the sample cdi3.json.
   // All 34 IDs/names from bundled sample CDI3, grouped by UI semantics.
   static const params=<_CatItem>[
@@ -103,8 +104,13 @@ class _FlKeyboardCatDebugStudioState extends State<FlKeyboardCatDebugStudio> {
   double globalPhysics=100;
   @override void initState(){
     super.initState();
+    _parameterSearch=TextEditingController();
     section=widget.initialSection.clamp(0,4);
     for(final a in actions)actionModes[a.token]=a.defaultMode;
+  }
+  @override void dispose(){
+    _parameterSearch.dispose();
+    super.dispose();
   }
   void _reset(){
     setState((){
@@ -124,6 +130,7 @@ class _FlKeyboardCatDebugStudioState extends State<FlKeyboardCatDebugStudio> {
       parameterCategory='全部';actionCategory='全部';
       modifiedOnly=false;lockedOnly=false;
       query='';bindingNotice=null;
+      _parameterSearch.clear();
     });
   }
   void _bind(String token,String value) {
@@ -315,6 +322,7 @@ class _FlKeyboardCatDebugStudioState extends State<FlKeyboardCatDebugStudio> {
       ]),
       const SizedBox(height:10),
       TextField(key:const ValueKey('cat-param-search'),
+        controller:_parameterSearch,
         decoration:const InputDecoration(
           prefixIcon:Icon(Icons.search_rounded),
           hintText:'搜索参数 ID / 名称',isDense:true),
@@ -346,6 +354,7 @@ class _FlKeyboardCatDebugStudioState extends State<FlKeyboardCatDebugStudio> {
         TextButton(
           key:const ValueKey('cat-clear-filters'),
           onPressed:()=>setState((){
+            _parameterSearch.clear();
             query='';parameterCategory='全部';
             modifiedOnly=false;lockedOnly=false;
           }),

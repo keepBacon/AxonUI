@@ -26,3 +26,5 @@ GPL-3.0。第三方版权及许可声明保留在原始源文件和授权文档�
 ## 键盘猫模型功能与参数调试（仅 UI）
 
 新增 `FlKeyboardCatDebugStudio`：功能动作列表、触发方式（hold/toggle/pulse/sequence）、本地快捷键绑定、CDI3 参数搜索与锁定、表情权重、Physics 全局/分组强度、分组热键。样本参数来自 Axon-Input 的 `bongocat/keyboard/demomodel2.cdi3.json`，表情和动作列表来自样本 `cat.model3.json`。演示 Physics 组不是该样本模型的真实组，不渲染或载入任何模型文件，也不触发实际设备事件。入口位于键显和功能详情。
+
+- 调试面板筛选项已使用受控输入框：清除筛选和全局重置会同时清空搜索文字及查询条件，并有 Widget 自动化验证。仅 UI 层，不触及原生模型服务。
